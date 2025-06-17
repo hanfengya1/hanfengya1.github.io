@@ -1,0 +1,49 @@
+name: Deploy Hexo to GitHub Pages
+
+on:
+  push:
+    branches:
+      - hexo # 或你使用的默认分支名称
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout blog source
+        uses: actions/checkout@v2
+        with:
+          path: blog
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16" # 设置 Node.js 版本
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./blog
+
+      - name: Install Hexo CLI
+        run: npm install -g hexo-cli
+        working-directory: ./blog
+
+      - name: Generate static pages
+        run: hexo generate
+        working-directory: ./blog
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.PERSONAL_TOKEN }}
+          publish_dir: ./blog/public
+          external_repository: hanfengya1/hanfengya1.github.io # 更改为你的 GitHub Pages 仓库, username 是你的用户名
+          publish_branch: main # GitHub Pages 分支
