@@ -1,0 +1,18 @@
+#footer {
+  /* 柔和蓝灰 */
+  background: linear-gradient(135deg, #49B1F5 0%, #00c4b6 100%) !important;
+  color: #fff;
+}
+
+#footer a {
+  color: #fff;
+  transition: color 0.3s;
+}
+
+#footer a:hover {
+  color: #ffd700;
+}
+
+#footer .footer-separator {
+  background: rgba(255,255,255,0.3);
+}
