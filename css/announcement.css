@@ -1,0 +1,43 @@
+/* 公告渐变流动特效 */
+.announcement-gradient {
+  padding: 12px 15px;
+  background: linear-gradient(135deg, rgba(73,177,245,0.1), rgba(0,196,182,0.1));
+  border-left: 4px solid #49B1F5;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 2;
+}
+
+.announcement-gradient p {
+  margin: 0;
+  color: #2c3e50;
+  font-weight: 500;
+  background: linear-gradient(90deg, #49B1F5, #00c4b6, #FF7242, #49B1F5);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-flow 8s ease infinite;
+}
+
+.announcement-gradient p:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.announcement-gradient p:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes gradient-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* 深色模式适配 */
+[data-theme="dark"] .announcement-gradient {
+  background: linear-gradient(135deg, rgba(73,177,245,0.15), rgba(0,196,182,0.15));
+}
+
+[data-theme="dark"] .announcement-gradient p {
+  color: #e0e0e0;
+}
