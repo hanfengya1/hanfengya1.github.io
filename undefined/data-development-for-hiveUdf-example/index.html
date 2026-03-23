@@ -1,0 +1,738 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>data_development_for_hiveUdf_example | ALICS</title><meta name="author" content="HangFengYa"><meta name="copyright" content="HangFengYa"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Hive自定义函数（UDF）编写教程与案例适用场景：从数据库尾表获取数据，通过传入参数匹配并返回一个或多个结果；兼顾Java实现（推荐）与Python实现（补充），适配Python基础开发者的理解需求。 一、Hive自定义函数（UDF）核心概念Hive UDF主要分为三类，根据输入-输出关系选择适用类型：  UDF（User-Defined Function）：单行输入→单行输出（最常用，完全匹配">
+<meta property="og:type" content="article">
+<meta property="og:title" content="data_development_for_hiveUdf_example">
+<meta property="og:url" content="http://hangfengya.com/undefined/data-development-for-hiveUdf-example/index.html">
+<meta property="og:site_name" content="ALICS">
+<meta property="og:description" content="Hive自定义函数（UDF）编写教程与案例适用场景：从数据库尾表获取数据，通过传入参数匹配并返回一个或多个结果；兼顾Java实现（推荐）与Python实现（补充），适配Python基础开发者的理解需求。 一、Hive自定义函数（UDF）核心概念Hive UDF主要分为三类，根据输入-输出关系选择适用类型：  UDF（User-Defined Function）：单行输入→单行输出（最常用，完全匹配">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://wmimg.com/i/2062/2026/03/69bcc3d54adb7.jpg">
+<meta property="article:published_time" content="2026-03-23T03:19:44.000Z">
+<meta property="article:modified_time" content="2026-03-23T03:31:15.035Z">
+<meta property="article:author" content="HangFengYa">
+<meta property="article:tag" content="hive">
+<meta property="article:tag" content="udf">
+<meta property="article:tag" content="data devlopment">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wmimg.com/i/2062/2026/03/69bcc3d54adb7.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "data_development_for_hiveUdf_example",
+  "url": "http://hangfengya.com/undefined/data-development-for-hiveUdf-example/",
+  "image": "https://wmimg.com/i/2062/2026/03/69bcc3d54adb7.jpg",
+  "datePublished": "2026-03-23T03:19:44.000Z",
+  "dateModified": "2026-03-23T03:31:15.035Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ALICS",
+      "url": "http://hangfengya.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://hangfengya.com/undefined/data-development-for-hiveUdf-example/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.json","preload":true,"top_n_per_article":3,"unescape":false,"pagination":{"enable":true,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":400,"highlightFullpage":true,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'data_development_for_hiveUdf_example',
+  isHighlightShrink: true,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/announcement.css"><link rel="stylesheet" href="/css/footer.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/photos/01.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-book"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://wmimg.com/i/2062/2026/03/69bcc3d54adb7.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ALICS</span></a><a class="nav-page-title" href="/"><span class="site-name">data_development_for_hiveUdf_example</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-book"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">data_development_for_hiveUdf_example</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-03-23T03:19:44.000Z" title="发表于 2026-03-23 11:19:44">2026-03-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-03-23T03:31:15.035Z" title="更新于 2026-03-23 11:31:15">2026-03-23</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/job/">job</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">2.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>11分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="Hive自定义函数（UDF）编写教程与案例"><a href="#Hive自定义函数（UDF）编写教程与案例" class="headerlink" title="Hive自定义函数（UDF）编写教程与案例"></a>Hive自定义函数（UDF）编写教程与案例</h1><p>适用场景：从数据库尾表获取数据，通过传入参数匹配并返回一个或多个结果；兼顾Java实现（推荐）与Python实现（补充），适配Python基础开发者的理解需求。</p>
+<h2 id="一、Hive自定义函数（UDF）核心概念"><a href="#一、Hive自定义函数（UDF）核心概念" class="headerlink" title="一、Hive自定义函数（UDF）核心概念"></a>一、Hive自定义函数（UDF）核心概念</h2><p>Hive UDF主要分为三类，根据<strong>输入-输出</strong>关系选择适用类型：</p>
+<ul>
+<li>UDF（User-Defined Function）：单行输入→单行输出（最常用，完全匹配本次需求）</li>
+<li>UDAF（User-Defined Aggregation Function）：多行输入→单行输出（聚合函数，如sum&#x2F;avg）</li>
+<li>UDTF（User-Defined Table-Generating Function）：单行输入→多行输出（如explode函数）</li>
+</ul>
+<p>本次场景为<strong>传入参数匹配尾表数据返回结果</strong>，优先选择UDF进行实现。</p>
+<h2 id="二、核心注意事项（必看）"><a href="#二、核心注意事项（必看）" class="headerlink" title="二、核心注意事项（必看）"></a>二、核心注意事项（必看）</h2><ol>
+<li>依赖约束：Java实现必须继承<code>org.apache.hadoop.hive.ql.exec.UDF</code>类，且核心业务逻辑写在<code>evaluate()</code>方法中（Hive固定调用此方法）。</li>
+<li>数据连接：尾表数据建议提前加载到内存（如静态Map&#x2F;List），避免每次调用<code>evaluate()</code>都建立数据库连接（会导致性能急剧下降）。</li>
+<li>线程安全：UDF实例会被Hive多线程复用，类中禁止定义非线程安全的变量（如未加锁的HashMap，建议用ConcurrentHashMap）。</li>
+<li>数据类型：Hive数据类型与Java&#x2F;Hadoop类型存在对应关系，需精准匹配。</li>
+<li>资源打包：需将JDBC驱动、自定义UDF类打包成JAR文件，上传到Hive客户端或HDFS。</li>
+<li>异常处理：必须捕获数据库连接、数据查询、参数匹配等异常，避免UDF执行失败中断整个Hive SQL任务。</li>
+</ol>
+<h3 id="附：Hive与Java-Hadoop类型对应表"><a href="#附：Hive与Java-Hadoop类型对应表" class="headerlink" title="附：Hive与Java&#x2F;Hadoop类型对应表"></a>附：Hive与Java&#x2F;Hadoop类型对应表</h3><table>
+<thead>
+<tr>
+<th>Hive数据类型</th>
+<th>Java数据类型</th>
+<th>Hadoop Writable类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>string</td>
+<td>String</td>
+<td>Text</td>
+</tr>
+<tr>
+<td>int</td>
+<td>Integer</td>
+<td>IntWritable</td>
+</tr>
+<tr>
+<td>bigint</td>
+<td>Long</td>
+<td>LongWritable</td>
+</tr>
+<tr>
+<td>double</td>
+<td>Double</td>
+<td>DoubleWritable</td>
+</tr>
+</tbody></table>
+<h2 id="三、完整案例实现（Java版，推荐生产使用）"><a href="#三、完整案例实现（Java版，推荐生产使用）" class="headerlink" title="三、完整案例实现（Java版，推荐生产使用）"></a>三、完整案例实现（Java版，推荐生产使用）</h2><p>以<strong>从MySQL尾表查询匹配数据</strong>为例，实现传入key返回对应多字段结果的UDF。</p>
+<h3 id="步骤1：环境准备"><a href="#步骤1：环境准备" class="headerlink" title="步骤1：环境准备"></a>步骤1：环境准备</h3><ul>
+<li>基础环境：JDK 1.8+（Hive主流版本适配）、Hive 2.x&#x2F;3.x、MySQL（存储尾表数据）</li>
+<li>依赖文件：MySQL驱动（mysql-connector-java-8.0.30.jar）</li>
+<li>构建工具：Maven（用于编译打包，简化依赖管理）</li>
+</ul>
+<h3 id="步骤2：Maven依赖配置（pom-xml）"><a href="#步骤2：Maven依赖配置（pom-xml）" class="headerlink" title="步骤2：Maven依赖配置（pom.xml）"></a>步骤2：Maven依赖配置（pom.xml）</h3><p>用于声明Hive、Hadoop、MySQL驱动等依赖，确保编译时能引入相关类库。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://maven.apache.org/POM/4.0.0&quot;</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.hive.udf<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hive-udf-demo<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- Hive UDF核心依赖（集群已存在，打包时排除） --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.hive<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hive-exec<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.1.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">scope</span>&gt;</span>provided<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- Hadoop依赖（集群已存在，打包时排除） --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.hadoop<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hadoop-common<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.1.4<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">scope</span>&gt;</span>provided<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- MySQL驱动（打包时包含） --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>8.0.30<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 编译插件（指定JDK版本） --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-compiler-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.8.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">source</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">source</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">target</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 打包插件（包含依赖，生成可直接使用的JAR） --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-shade-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.2.4<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">phase</span>&gt;</span>package<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goals</span>&gt;</span><span class="tag">&lt;<span class="name">goal</span>&gt;</span>shade<span class="tag">&lt;/<span class="name">goal</span>&gt;</span><span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="步骤3：核心UDF代码实现"><a href="#步骤3：核心UDF代码实现" class="headerlink" title="步骤3：核心UDF代码实现"></a>步骤3：核心UDF代码实现</h3><p>核心逻辑：类加载时从MySQL尾表加载数据到静态缓存→通过<code>evaluate()</code>方法接收参数→从缓存匹配数据并返回。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.hive.udf;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hive.ql.exec.UDF;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.sql.Connection;</span><br><span class="line"><span class="keyword">import</span> java.sql.DriverManager;</span><br><span class="line"><span class="keyword">import</span> java.sql.PreparedStatement;</span><br><span class="line"><span class="keyword">import</span> java.sql.ResultSet;</span><br><span class="line"><span class="keyword">import</span> java.util.ConcurrentHashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Hive自定义UDF：从MySQL尾表根据参数匹配数据</span></span><br><span class="line"><span class="comment"> * 功能：传入key，返回尾表中对应的多字段结果（用逗号分隔）</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TailTableUDF</span> <span class="keyword">extends</span> <span class="title class_">UDF</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 线程安全的静态Map：缓存尾表数据（类加载时初始化，仅加载一次）</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, String&gt; tailTableCache = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 静态代码块：类加载时执行，初始化缓存</span></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="comment">// 1. 数据库连接参数（生产环境建议通过配置文件读取，此处简化）</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">url</span> <span class="operator">=</span> <span class="string">&quot;jdbc:mysql://xxx.xxx.xxx.xxx:3306/your_db?useSSL=false&amp;serverTimezone=UTC&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">user</span> <span class="operator">=</span> <span class="string">&quot;root&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">password</span> <span class="operator">=</span> <span class="string">&quot;your_password&quot;</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="type">PreparedStatement</span> <span class="variable">pstmt</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="type">ResultSet</span> <span class="variable">rs</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 2. 加载MySQL驱动并建立连接</span></span><br><span class="line">            Class.forName(<span class="string">&quot;com.mysql.cj.jdbc.Driver&quot;</span>);</span><br><span class="line">            conn = DriverManager.getConnection(url, user, password);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 3. 查询尾表数据（数据量大时建议分页加载）</span></span><br><span class="line">            <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;SELECT key_col, value_col1, value_col2 FROM tail_table&quot;</span>;</span><br><span class="line">            pstmt = conn.prepareStatement(sql);</span><br><span class="line">            rs = pstmt.executeQuery();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 4. 数据存入缓存（key：匹配字段，value：多字段组合结果）</span></span><br><span class="line">            <span class="keyword">while</span> (rs.next()) &#123;</span><br><span class="line">                <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> rs.getString(<span class="string">&quot;key_col&quot;</span>);</span><br><span class="line">                <span class="type">String</span> <span class="variable">value1</span> <span class="operator">=</span> rs.getString(<span class="string">&quot;value_col1&quot;</span>);</span><br><span class="line">                <span class="type">String</span> <span class="variable">value2</span> <span class="operator">=</span> rs.getString(<span class="string">&quot;value_col2&quot;</span>);</span><br><span class="line">                <span class="type">String</span> <span class="variable">combinedValue</span> <span class="operator">=</span> value1 + <span class="string">&quot;,&quot;</span> + value2; <span class="comment">// 自定义返回格式</span></span><br><span class="line">                tailTableCache.put(key, combinedValue);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(<span class="string">&quot;尾表数据加载完成，缓存条数：&quot;</span> + tailTableCache.size());</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="comment">// 初始化失败直接抛出异常，避免UDF无效运行</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;尾表数据加载失败：&quot;</span> + e.getMessage(), e);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">// 5. 关闭数据库资源</span></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (rs != <span class="literal">null</span>) rs.close();</span><br><span class="line">                <span class="keyword">if</span> (pstmt != <span class="literal">null</span>) pstmt.close();</span><br><span class="line">                <span class="keyword">if</span> (conn != <span class="literal">null</span>) conn.close();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 核心方法：evaluate（Hive调用此方法，方法名固定，支持重载）</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> inputKey 传入的匹配参数（Hive的string对应Text类型）</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 匹配结果（无匹配返回空字符串）</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> Text <span class="title function_">evaluate</span><span class="params">(Text inputKey)</span> &#123;</span><br><span class="line">        <span class="comment">// 参数校验：处理空值和空字符串</span></span><br><span class="line">        <span class="keyword">if</span> (inputKey == <span class="literal">null</span> || inputKey.toString().trim().isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Text</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 从缓存匹配数据并返回</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> inputKey.toString().trim();</span><br><span class="line">        <span class="type">String</span> <span class="variable">result</span> <span class="operator">=</span> tailTableCache.get(key);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Text</span>(result == <span class="literal">null</span> ? <span class="string">&quot;&quot;</span> : result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 重载方法：支持传入多个参数，返回多个匹配结果（用竖线分隔）</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> Text <span class="title function_">evaluate</span><span class="params">(Text inputKey1, Text inputKey2)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (inputKey1 == <span class="literal">null</span> || inputKey2 == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Text</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">String</span> <span class="variable">key1</span> <span class="operator">=</span> inputKey1.toString().trim();</span><br><span class="line">        <span class="type">String</span> <span class="variable">key2</span> <span class="operator">=</span> inputKey2.toString().trim();</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">result1</span> <span class="operator">=</span> tailTableCache.get(key1);</span><br><span class="line">        <span class="type">String</span> <span class="variable">result2</span> <span class="operator">=</span> tailTableCache.get(key2);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Text</span>((result1 == <span class="literal">null</span> ? <span class="string">&quot;&quot;</span> : result1) + <span class="string">&quot;|&quot;</span> + (result2 == <span class="literal">null</span> ? <span class="string">&quot;&quot;</span> : result2));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 本地测试方法：开发时调试用</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">TailTableUDF</span> <span class="variable">udf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TailTableUDF</span>();</span><br><span class="line">        <span class="comment">// 测试单参数</span></span><br><span class="line">        System.out.println(udf.evaluate(<span class="keyword">new</span> <span class="title class_">Text</span>(<span class="string">&quot;test_key1&quot;</span>))); <span class="comment">// 输出：value1,value2</span></span><br><span class="line">        <span class="comment">// 测试多参数</span></span><br><span class="line">        System.out.println(udf.evaluate(<span class="keyword">new</span> <span class="title class_">Text</span>(<span class="string">&quot;test_key1&quot;</span>), <span class="keyword">new</span> <span class="title class_">Text</span>(<span class="string">&quot;test_key2&quot;</span>))); <span class="comment">// 输出：value1,value2|value3,value4</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、UDF部署与使用步骤"><a href="#四、UDF部署与使用步骤" class="headerlink" title="四、UDF部署与使用步骤"></a>四、UDF部署与使用步骤</h2><h3 id="步骤1：打包生成JAR文件"><a href="#步骤1：打包生成JAR文件" class="headerlink" title="步骤1：打包生成JAR文件"></a>步骤1：打包生成JAR文件</h3><p>在Maven项目根目录执行命令，生成包含依赖的JAR文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn clean package</span><br></pre></td></tr></table></figure>
+<p>生成的JAR文件位于项目的target目录下，如：<code>hive-udf-demo-1.0-SNAPSHOT.jar</code>。</p>
+<h3 id="步骤2：上传JAR到Hive环境"><a href="#步骤2：上传JAR到Hive环境" class="headerlink" title="步骤2：上传JAR到Hive环境"></a>步骤2：上传JAR到Hive环境</h3><ol>
+<li>上传JAR到Hive服务器本地目录（临时使用）：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp target/hive-udf-demo-1.0-SNAPSHOT.jar root@hive-server:/opt/hive-udf/</span><br></pre></td></tr></table></figure></li>
+<li>或上传到HDFS（永久使用，推荐）：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hdfs dfs -put /opt/hive-udf/hive-udf-demo-1.0-SNAPSHOT.jar /user/hive/udf/</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="步骤3：Hive中注册并使用UDF"><a href="#步骤3：Hive中注册并使用UDF" class="headerlink" title="步骤3：Hive中注册并使用UDF"></a>步骤3：Hive中注册并使用UDF</h3><p>登录Hive客户端（<code>hive</code>命令），执行以下SQL注册并使用UDF：</p>
+<h4 id="1-临时注册（会话级，重启Hive失效）"><a href="#1-临时注册（会话级，重启Hive失效）" class="headerlink" title="1. 临时注册（会话级，重启Hive失效）"></a>1. 临时注册（会话级，重启Hive失效）</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 加载JAR文件</span></span><br><span class="line"><span class="keyword">ADD</span> JAR <span class="operator">/</span>opt<span class="operator">/</span>hive<span class="operator">-</span>udf<span class="operator">/</span>hive<span class="operator">-</span>udf<span class="operator">-</span>demo<span class="number">-1.0</span><span class="operator">-</span>SNAPSHOT.jar;</span><br><span class="line"><span class="comment">-- 注册临时函数（函数名：get_tail_data，对应Java类全路径）</span></span><br><span class="line"><span class="keyword">CREATE</span> TEMPORARY <span class="keyword">FUNCTION</span> get_tail_data <span class="keyword">AS</span> <span class="string">&#x27;com.hive.udf.TailTableUDF&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-永久注册（集群级，重启后仍可用）"><a href="#2-永久注册（集群级，重启后仍可用）" class="headerlink" title="2. 永久注册（集群级，重启后仍可用）"></a>2. 永久注册（集群级，重启后仍可用）</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> default.get_tail_data </span><br><span class="line"><span class="keyword">AS</span> <span class="string">&#x27;com.hive.udf.TailTableUDF&#x27;</span> </span><br><span class="line"><span class="keyword">USING</span> JAR <span class="string">&#x27;hdfs:///user/hive/udf/hive-udf-demo-1.0-SNAPSHOT.jar&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-使用UDF查询数据"><a href="#3-使用UDF查询数据" class="headerlink" title="3. 使用UDF查询数据"></a>3. 使用UDF查询数据</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 单参数使用：根据id匹配尾表数据</span></span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">    id,</span><br><span class="line">    name,</span><br><span class="line">    get_tail_data(id) <span class="keyword">AS</span> tail_value <span class="comment">-- 返回value1,value2</span></span><br><span class="line"><span class="keyword">FROM</span> your_hive_table;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 多参数使用：根据id和name匹配</span></span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">    id,</span><br><span class="line">    name,</span><br><span class="line">    get_tail_data(id, name) <span class="keyword">AS</span> multi_tail_value <span class="comment">-- 返回value1,value2|value3,value4</span></span><br><span class="line"><span class="keyword">FROM</span> your_hive_table;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、Python版UDF（补充，小数据量适用）"><a href="#五、Python版UDF（补充，小数据量适用）" class="headerlink" title="五、Python版UDF（补充，小数据量适用）"></a>五、Python版UDF（补充，小数据量适用）</h2><p>Hive Python UDF性能低于Java版，适合小数据量场景，核心逻辑与Java版一致。</p>
+<h3 id="步骤1：编写Python脚本（tail-table-udf-py）"><a href="#步骤1：编写Python脚本（tail-table-udf-py）" class="headerlink" title="步骤1：编写Python脚本（tail_table_udf.py）"></a>步骤1：编写Python脚本（tail_table_udf.py）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全局缓存：存储尾表数据</span></span><br><span class="line">tail_table_cache = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">init_cache</span>():</span><br><span class="line">    <span class="string">&quot;&quot;&quot;初始化缓存：从MySQL尾表加载数据&quot;&quot;&quot;</span></span><br><span class="line">    conn = pymysql.connect(</span><br><span class="line">        host=<span class="string">&#x27;xxx.xxx.xxx.xxx&#x27;</span>,</span><br><span class="line">        port=<span class="number">3306</span>,</span><br><span class="line">        user=<span class="string">&#x27;root&#x27;</span>,</span><br><span class="line">        password=<span class="string">&#x27;your_password&#x27;</span>,</span><br><span class="line">        db=<span class="string">&#x27;your_db&#x27;</span>,</span><br><span class="line">        charset=<span class="string">&#x27;utf8&#x27;</span></span><br><span class="line">    )</span><br><span class="line">    cursor = conn.cursor()</span><br><span class="line">    <span class="comment"># 查询尾表数据</span></span><br><span class="line">    cursor.execute(<span class="string">&quot;SELECT key_col, value_col1, value_col2 FROM tail_table&quot;</span>)</span><br><span class="line">    <span class="comment"># 存入缓存</span></span><br><span class="line">    <span class="keyword">for</span> row <span class="keyword">in</span> cursor.fetchall():</span><br><span class="line">        key = row[<span class="number">0</span>]</span><br><span class="line">        value = <span class="string">f&quot;<span class="subst">&#123;row[<span class="number">1</span>]&#125;</span>,<span class="subst">&#123;row[<span class="number">2</span>]&#125;</span>&quot;</span></span><br><span class="line">        tail_table_cache[key] = value</span><br><span class="line">    cursor.close()</span><br><span class="line">    conn.close()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化缓存</span></span><br><span class="line">init_cache()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 处理Hive传入的参数并返回结果</span></span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> sys.stdin:</span><br><span class="line">    <span class="comment"># 去除换行符，分割参数（Hive默认用制表符分隔）</span></span><br><span class="line">    params = line.strip().split(<span class="string">&#x27;\t&#x27;</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> params <span class="keyword">or</span> params[<span class="number">0</span>] == <span class="string">&#x27;&#x27;</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    <span class="comment"># 匹配数据并输出</span></span><br><span class="line">    key = params[<span class="number">0</span>]</span><br><span class="line">    result = tail_table_cache.get(key, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">    <span class="built_in">print</span>(result)</span><br></pre></td></tr></table></figure>
+
+<h3 id="步骤2：Hive中使用Python-UDF"><a href="#步骤2：Hive中使用Python-UDF" class="headerlink" title="步骤2：Hive中使用Python UDF"></a>步骤2：Hive中使用Python UDF</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 加载Python脚本</span></span><br><span class="line"><span class="keyword">ADD</span> FILE <span class="operator">/</span>opt<span class="operator">/</span>hive<span class="operator">-</span>udf<span class="operator">/</span>tail_table_udf.py;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 使用TRANSFORM调用Python UDF</span></span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">    TRANSFORM(id) </span><br><span class="line">    <span class="keyword">USING</span> <span class="string">&#x27;python tail_table_udf.py&#x27;</span> </span><br><span class="line">    <span class="keyword">AS</span> tail_value </span><br><span class="line"><span class="keyword">FROM</span> your_hive_table;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、优化与避坑指南"><a href="#六、优化与避坑指南" class="headerlink" title="六、优化与避坑指南"></a>六、优化与避坑指南</h2><h3 id="1-性能优化"><a href="#1-性能优化" class="headerlink" title="1. 性能优化"></a>1. 性能优化</h3><ul>
+<li>缓存优化：数据量大时，用Redis替代本地Map，支持缓存过期和分片；小数据量用ConcurrentHashMap保证线程安全。</li>
+<li>连接优化：生产环境用Druid&#x2F;HikariCP数据库连接池，替代DriverManager直连，减少连接开销。</li>
+<li>数据加载：尾表数据超10万条时，按业务维度分片加载，避免类初始化耗时过长。</li>
+</ul>
+<h3 id="2-常见问题解决"><a href="#2-常见问题解决" class="headerlink" title="2. 常见问题解决"></a>2. 常见问题解决</h3><ul>
+<li>空指针异常：必须对<code>inputKey</code>和缓存结果做非空校验，返回空字符串而非null。</li>
+<li>类加载失败：确保JAR包包含所有依赖（尤其是MySQL驱动），可通过<code>jar -tf 文件名.jar</code>查看类是否存在。</li>
+<li>线程安全问题：避免在<code>evaluate()</code>中修改类成员变量，缓存用ConcurrentHashMap。</li>
+</ul>
+<h3 id="3-调试技巧"><a href="#3-调试技巧" class="headerlink" title="3. 调试技巧"></a>3. 调试技巧</h3><ul>
+<li>本地调试：通过<code>main</code>方法模拟参数传入，验证业务逻辑正确性。</li>
+<li>Hive调试：在UDF中加入<code>System.out.println()</code>，通过<code>hive &gt; set hive.exec.debug=true;</code>查看输出日志。</li>
+</ul>
+<h2 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h2><ul>
+<li>选型建议：生产环境优先用Java UDF（性能高、稳定性强），小数据量或快速验证用Python UDF。</li>
+<li>核心流程：继承UDF类→实现<code>evaluate()</code>→加载数据到缓存→参数匹配→返回结果。</li>
+<li>适配扩展：如需连接Oracle&#x2F;Hive内部表，仅需修改JDBC驱动和连接参数，核心逻辑通用。</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://hangfengya.com">ALICS</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="/">/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">此文章版權歸 ALICS 所有，如有轉載，請註明來自原作者</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/hive/">hive</a><a class="post-meta__tags" href="/tags/udf/">udf</a><a class="post-meta__tags" href="/tags/data-devlopment/">data devlopment</a></div><div class="post-share"><div class="social-share" data-image="https://wmimg.com/i/2062/2026/03/69bcc3d54adb7.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/undefined/pte-note/" title="pte note"><img class="cover" src="https://wmimg.com/i/2062/2026/03/69bcc42e1d0c9.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">pte note</div></div><div class="info-2"><div class="info-item-1">     .video-container {     position: relative;     width: 100%;     padding-top: 56.25%; /* 16:9 aspect ratio (height/width = 9/16 * 100%) */ }  .video-container iframe {     position: absolute;     top: 0;     left: 0;     width: 100%;     height: 100%; }   </div></div></div></a><a class="pagination-related" href="/undefined/my-charts/" title="my charts"><img class="cover" src="https://wmimg.com/i/2062/2026/03/69bcbc3c5248f.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">my charts</div></div><div class="info-2"><div class="info-item-1">             {     &quot;type&quot;: &quot;pie&quot;,     &quot;data&quot;: {         &quot;labels&quot;: [             &quot;编程&quot;,             &quot;音乐&quot;,             &quot;阅读&quot;,             &quot;游戏&quot;,             &quot;健身&quot;,             &quot;旅游&quot;         ],         &quot;datasets&quot;: [             {                 &quot;label&quot;: &quot;喜爱指数&quot;,                 &quot;data&quot;: [                     30,                     24,                     19,     ...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/undefined/data_development_for_hongxing/" title="data development for hongxing"><img class="cover" src="https://wmimg.com/i/2062/2026/03/69bcc42e1d0c9.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-18</div><div class="info-item-2">data development for hongxing</div></div><div class="info-2"><div class="info-item-1">【将json字符串转成多列的函数】12345678910111213WITH      cte_base_i18n_lang_dict AS (SELECT explode(udf.read_json(zh_cn)) AS j_zh_cn                                FROM stg.stg_base_i18n_lang_dict                                WHERE dt = &#x27;2025-10-12&#x27;                                  AND delete_flag = &#x27;0&#x27;                                  AND code in (&#x27;enum_inventory_BillTypeInEnum&#x27;, &#x27;enum_inventory_BillTypeOutEnum&#x27;,                                               &#x2...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/photos/01.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">HangFengYa</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" href="javascript:void(0);"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content"><div class="announcement-gradient"><p>Life is like a period.</p><p>Annoying when it's here.</p><p>Panicking when it's not.</p></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Hive%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%EF%BC%88UDF%EF%BC%89%E7%BC%96%E5%86%99%E6%95%99%E7%A8%8B%E4%B8%8E%E6%A1%88%E4%BE%8B"><span class="toc-number">1.</span> <span class="toc-text">Hive自定义函数（UDF）编写教程与案例</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81Hive%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%EF%BC%88UDF%EF%BC%89%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="toc-number">1.1.</span> <span class="toc-text">一、Hive自定义函数（UDF）核心概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E6%A0%B8%E5%BF%83%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%88%E5%BF%85%E7%9C%8B%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">二、核心注意事项（必看）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%99%84%EF%BC%9AHive%E4%B8%8EJava-Hadoop%E7%B1%BB%E5%9E%8B%E5%AF%B9%E5%BA%94%E8%A1%A8"><span class="toc-number">1.2.1.</span> <span class="toc-text">附：Hive与Java&#x2F;Hadoop类型对应表</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%AE%8C%E6%95%B4%E6%A1%88%E4%BE%8B%E5%AE%9E%E7%8E%B0%EF%BC%88Java%E7%89%88%EF%BC%8C%E6%8E%A8%E8%8D%90%E7%94%9F%E4%BA%A7%E4%BD%BF%E7%94%A8%EF%BC%89"><span class="toc-number">1.3.</span> <span class="toc-text">三、完整案例实现（Java版，推荐生产使用）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A41%EF%BC%9A%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="toc-number">1.3.1.</span> <span class="toc-text">步骤1：环境准备</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A42%EF%BC%9AMaven%E4%BE%9D%E8%B5%96%E9%85%8D%E7%BD%AE%EF%BC%88pom-xml%EF%BC%89"><span class="toc-number">1.3.2.</span> <span class="toc-text">步骤2：Maven依赖配置（pom.xml）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A43%EF%BC%9A%E6%A0%B8%E5%BF%83UDF%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.3.3.</span> <span class="toc-text">步骤3：核心UDF代码实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81UDF%E9%83%A8%E7%BD%B2%E4%B8%8E%E4%BD%BF%E7%94%A8%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.4.</span> <span class="toc-text">四、UDF部署与使用步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A41%EF%BC%9A%E6%89%93%E5%8C%85%E7%94%9F%E6%88%90JAR%E6%96%87%E4%BB%B6"><span class="toc-number">1.4.1.</span> <span class="toc-text">步骤1：打包生成JAR文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A42%EF%BC%9A%E4%B8%8A%E4%BC%A0JAR%E5%88%B0Hive%E7%8E%AF%E5%A2%83"><span class="toc-number">1.4.2.</span> <span class="toc-text">步骤2：上传JAR到Hive环境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A43%EF%BC%9AHive%E4%B8%AD%E6%B3%A8%E5%86%8C%E5%B9%B6%E4%BD%BF%E7%94%A8UDF"><span class="toc-number">1.4.3.</span> <span class="toc-text">步骤3：Hive中注册并使用UDF</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E4%B8%B4%E6%97%B6%E6%B3%A8%E5%86%8C%EF%BC%88%E4%BC%9A%E8%AF%9D%E7%BA%A7%EF%BC%8C%E9%87%8D%E5%90%AFHive%E5%A4%B1%E6%95%88%EF%BC%89"><span class="toc-number">1.4.3.1.</span> <span class="toc-text">1. 临时注册（会话级，重启Hive失效）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%B0%B8%E4%B9%85%E6%B3%A8%E5%86%8C%EF%BC%88%E9%9B%86%E7%BE%A4%E7%BA%A7%EF%BC%8C%E9%87%8D%E5%90%AF%E5%90%8E%E4%BB%8D%E5%8F%AF%E7%94%A8%EF%BC%89"><span class="toc-number">1.4.3.2.</span> <span class="toc-text">2. 永久注册（集群级，重启后仍可用）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E4%BD%BF%E7%94%A8UDF%E6%9F%A5%E8%AF%A2%E6%95%B0%E6%8D%AE"><span class="toc-number">1.4.3.3.</span> <span class="toc-text">3. 使用UDF查询数据</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81Python%E7%89%88UDF%EF%BC%88%E8%A1%A5%E5%85%85%EF%BC%8C%E5%B0%8F%E6%95%B0%E6%8D%AE%E9%87%8F%E9%80%82%E7%94%A8%EF%BC%89"><span class="toc-number">1.5.</span> <span class="toc-text">五、Python版UDF（补充，小数据量适用）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A41%EF%BC%9A%E7%BC%96%E5%86%99Python%E8%84%9A%E6%9C%AC%EF%BC%88tail-table-udf-py%EF%BC%89"><span class="toc-number">1.5.1.</span> <span class="toc-text">步骤1：编写Python脚本（tail_table_udf.py）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A42%EF%BC%9AHive%E4%B8%AD%E4%BD%BF%E7%94%A8Python-UDF"><span class="toc-number">1.5.2.</span> <span class="toc-text">步骤2：Hive中使用Python UDF</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E4%BC%98%E5%8C%96%E4%B8%8E%E9%81%BF%E5%9D%91%E6%8C%87%E5%8D%97"><span class="toc-number">1.6.</span> <span class="toc-text">六、优化与避坑指南</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96"><span class="toc-number">1.6.1.</span> <span class="toc-text">1. 性能优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="toc-number">1.6.2.</span> <span class="toc-text">2. 常见问题解决</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7"><span class="toc-number">1.6.3.</span> <span class="toc-text">3. 调试技巧</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E6%80%BB%E7%BB%93"><span class="toc-number">1.7.</span> <span class="toc-text">七、总结</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/undefined/pte-note/" title="pte note"><img src="https://wmimg.com/i/2062/2026/03/69bcc42e1d0c9.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="pte note"/></a><div class="content"><a class="title" href="/undefined/pte-note/" title="pte note">pte note</a><time datetime="2026-03-23T07:46:10.000Z" title="发表于 2026-03-23 15:46:10">2026-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/undefined/data-development-for-hiveUdf-example/" title="data_development_for_hiveUdf_example"><img src="https://wmimg.com/i/2062/2026/03/69bcc3d54adb7.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="data_development_for_hiveUdf_example"/></a><div class="content"><a class="title" href="/undefined/data-development-for-hiveUdf-example/" title="data_development_for_hiveUdf_example">data_development_for_hiveUdf_example</a><time datetime="2026-03-23T03:19:44.000Z" title="发表于 2026-03-23 11:19:44">2026-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/undefined/my-charts/" title="my charts"><img src="https://wmimg.com/i/2062/2026/03/69bcbc3c5248f.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="my charts"/></a><div class="content"><a class="title" href="/undefined/my-charts/" title="my charts">my charts</a><time datetime="2026-03-20T05:24:45.000Z" title="发表于 2026-03-20 13:24:45">2026-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/undefined/my-photos/" title="my photos"><img src="https://wmimg.com/i/2062/2026/03/69bcbc0ea9b63.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="my photos"/></a><div class="content"><a class="title" href="/undefined/my-photos/" title="my photos">my photos</a><time datetime="2026-03-20T03:44:50.000Z" title="发表于 2026-03-20 11:44:50">2026-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/undefined/2025%20summary/" title="2025 summary"><img src="https://wmimg.com/i/2062/2026/03/69bcbc1167673.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2025 summary"/></a><div class="content"><a class="title" href="/undefined/2025%20summary/" title="2025 summary">2025 summary</a><time datetime="2026-03-18T08:06:30.000Z" title="发表于 2026-03-18 16:06:30">2026-03-18</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By HangFengYa</span></div><div class="footer_custom_text">Hi, welcome to my <a href="">blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="/js/tw_cn.js?v=5.5.4"></script><div class="js-pjax"><script>(() => {
+  const parseViewBox = viewBox => {
+    if (!viewBox) return null
+    const parts = viewBox.trim().split(/[\s,]+/).map(n => Number(n))
+    if (parts.length !== 4 || parts.some(n => Number.isNaN(n))) return null
+    return parts
+  }
+
+  const getSvgViewBox = svg => {
+    const attr = parseViewBox(svg.getAttribute('viewBox'))
+    if (attr) return attr
+
+    // Fallback: use bbox to build a viewBox
+    try {
+      const bbox = svg.getBBox()
+      if (bbox && bbox.width && bbox.height) return [bbox.x, bbox.y, bbox.width, bbox.height]
+    } catch (e) {
+      // getBBox may fail on some edge cases; ignore
+    }
+
+    const w = Number(svg.getAttribute('width')) || 0
+    const h = Number(svg.getAttribute('height')) || 0
+    if (w > 0 && h > 0) return [0, 0, w, h]
+    return [0, 0, 100, 100]
+  }
+
+  const setSvgViewBox = (svg, vb) => {
+    svg.setAttribute('viewBox', `${vb[0]} ${vb[1]} ${vb[2]} ${vb[3]}`)
+  }
+
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v))
+
+  const openSvgInNewTab = ({ source, initViewBox }) => {
+    const getClonedSvg = () => {
+      if (typeof source === 'string') {
+        const template = document.createElement('template')
+        template.innerHTML = source.trim()
+        const svg = template.content.querySelector('svg')
+        return svg ? svg.cloneNode(true) : null
+      }
+      if (source && typeof source.cloneNode === 'function') {
+        return source.cloneNode(true)
+      }
+      return null
+    }
+
+    const clone = getClonedSvg()
+    if (!clone) return
+    if (initViewBox && initViewBox.length === 4) {
+      clone.setAttribute('viewBox', initViewBox.join(' '))
+    }
+    if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    if (!clone.getAttribute('xmlns:xlink') && clone.outerHTML.includes('xlink:')) {
+      clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+    }
+    // inject background to match current theme
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+    const bg = getComputedStyle(document.body).backgroundColor || (isDark ? '#1e1e1e' : '#ffffff')
+    if (!clone.style.background) clone.style.background = bg
+
+    const serializer = new XMLSerializer()
+    const svgSource = serializer.serializeToString(clone)
+    const htmlSource = `<!doctype html><html><head><meta charset="utf-8" />
+      <style>
+        html, body { width: 100%; height: 100%; margin: 0; display: flex; align-items: center; justify-content: center; background: ${bg}; }
+        svg { max-width: 100%; max-height: 100%; height: auto; width: auto; }
+      </style>
+      </head><body>${svgSource}</body></html>`
+    const blob = new Blob([htmlSource], { type: 'text/html;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank', 'noopener')
+    setTimeout(() => URL.revokeObjectURL(url), 30000)
+  }
+
+  const attachMermaidViewerButton = wrap => {
+    let btn = wrap.querySelector('.mermaid-open-btn')
+    if (!btn) {
+      btn = document.createElement('button')
+      btn.type = 'button'
+      btn.className = 'mermaid-open-btn'
+      wrap.appendChild(btn)
+    }
+
+    btn.innerHTML = '<i class="fa fa-search fa-fw" aria-hidden="true"></i>'
+
+    if (!btn.__mermaidViewerBound) {
+      btn.addEventListener('click', e => {
+        e.preventDefault()
+        e.stopPropagation()
+        const svg = wrap.__mermaidOriginalSvg || wrap.querySelector('svg')
+        if (!svg) return
+        const initViewBox = wrap.__mermaidInitViewBox
+        if (typeof svg === 'string') {
+          openSvgInNewTab({ source: svg, initViewBox })
+          return
+        }
+        openSvgInNewTab({ source: svg, initViewBox })
+      })
+      btn.__mermaidViewerBound = true
+    }
+  }
+
+  // Zoom around a point (px, py) in the SVG viewport (in viewBox coordinates)
+  const zoomAtPoint = (vb, factor, px, py) => {
+    const w = vb[2] * factor
+    const h = vb[3] * factor
+    const nx = px - (px - vb[0]) * factor
+    const ny = py - (py - vb[1]) * factor
+    return [nx, ny, w, h]
+  }
+
+  const initMermaidGestures = wrap => {
+    const svg = wrap.querySelector('svg')
+    if (!svg) return
+
+    // Ensure viewBox exists so gestures always work
+    const initVb = getSvgViewBox(svg)
+    wrap.__mermaidInitViewBox = initVb
+    wrap.__mermaidCurViewBox = initVb.slice()
+    setSvgViewBox(svg, initVb)
+
+    // Avoid binding multiple times on themeChange/pjax
+    if (wrap.__mermaidGestureBound) return
+    wrap.__mermaidGestureBound = true
+
+    // Helper: map client (viewport) coordinate -> viewBox coordinate
+    const clientToViewBox = (clientX, clientY) => {
+      const rect = svg.getBoundingClientRect()
+      const vb = wrap.__mermaidCurViewBox || getSvgViewBox(svg)
+      const x = vb[0] + (clientX - rect.left) * (vb[2] / rect.width)
+      const y = vb[1] + (clientY - rect.top) * (vb[3] / rect.height)
+      return { x, y, rect, vb }
+    }
+
+    const state = {
+      pointers: new Map(),
+      startVb: null,
+      startDist: 0,
+      startCenter: null
+    }
+
+    const clampVb = vb => {
+      const init = wrap.__mermaidInitViewBox || vb
+      const minW = init[2] * 0.1
+      const maxW = init[2] * 10
+      const minH = init[3] * 0.1
+      const maxH = init[3] * 10
+      vb[2] = clamp(vb[2], minW, maxW)
+      vb[3] = clamp(vb[3], minH, maxH)
+      return vb
+    }
+
+    const setCurVb = vb => {
+      vb = clampVb(vb)
+      wrap.__mermaidCurViewBox = vb
+      setSvgViewBox(svg, vb)
+    }
+
+    const onPointerDown = e => {
+      // Allow only primary button for mouse
+      if (e.pointerType === 'mouse' && e.button !== 0) return
+      svg.setPointerCapture(e.pointerId)
+      state.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+
+      if (state.pointers.size === 1) {
+        state.startVb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+      } else if (state.pointers.size === 2) {
+        const pts = [...state.pointers.values()]
+        const dx = pts[0].x - pts[1].x
+        const dy = pts[0].y - pts[1].y
+        state.startDist = Math.hypot(dx, dy)
+        state.startVb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+        state.startCenter = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 }
+      }
+    }
+
+    const onPointerMove = e => {
+      if (!state.pointers.has(e.pointerId)) return
+      state.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+
+      // Pan with 1 pointer
+      if (state.pointers.size === 1 && state.startVb) {
+        const p = [...state.pointers.values()][0]
+        const prev = { x: e.clientX - e.movementX, y: e.clientY - e.movementY }
+        // movementX/Y unreliable on touch, compute from stored last position
+        const last = wrap.__mermaidLastSinglePointer || p
+        const dxClient = p.x - last.x
+        const dyClient = p.y - last.y
+        wrap.__mermaidLastSinglePointer = p
+
+        const { rect } = clientToViewBox(p.x, p.y)
+        const vb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+        const dx = dxClient * (vb[2] / rect.width)
+        const dy = dyClient * (vb[3] / rect.height)
+        setCurVb([vb[0] - dx, vb[1] - dy, vb[2], vb[3]])
+        return
+      }
+
+      // Pinch zoom with 2 pointers
+      if (state.pointers.size === 2 && state.startVb && state.startDist > 0) {
+        const pts = [...state.pointers.values()]
+        const dx = pts[0].x - pts[1].x
+        const dy = pts[0].y - pts[1].y
+        const dist = Math.hypot(dx, dy)
+        if (!dist) return
+        const factor = state.startDist / dist // dist bigger => zoom in (viewBox smaller)
+
+        const cx = (pts[0].x + pts[1].x) / 2
+        const cy = (pts[0].y + pts[1].y) / 2
+        const centerClient = { x: cx, y: cy }
+
+        const pxy = clientToViewBox(centerClient.x, centerClient.y)
+        const cpx = pxy.x
+        const cpy = pxy.y
+
+        const vb = zoomAtPoint(state.startVb, factor, cpx, cpy)
+        setCurVb(vb)
+      }
+    }
+
+    const onPointerUpOrCancel = e => {
+      state.pointers.delete(e.pointerId)
+      if (state.pointers.size === 0) {
+        state.startVb = null
+        state.startDist = 0
+        state.startCenter = null
+        wrap.__mermaidLastSinglePointer = null
+      } else if (state.pointers.size === 1) {
+        // reset single pointer baseline to avoid jump
+        wrap.__mermaidLastSinglePointer = [...state.pointers.values()][0]
+      }
+    }
+
+    // Wheel zoom (mouse/trackpad)
+    const onWheel = e => {
+      // ctrlKey on mac trackpad pinch; we treat both as zoom
+      e.preventDefault()
+      const delta = e.deltaY
+      const zoomFactor = delta > 0 ? 1.1 : 0.9
+      const { x, y } = clientToViewBox(e.clientX, e.clientY)
+      const vb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+      setCurVb(zoomAtPoint(vb, zoomFactor, x, y))
+    }
+
+    const onDblClick = () => {
+      const init = wrap.__mermaidInitViewBox
+      if (!init) return
+      wrap.__mermaidCurViewBox = init.slice()
+      setSvgViewBox(svg, init)
+    }
+
+    svg.addEventListener('pointerdown', onPointerDown)
+    svg.addEventListener('pointermove', onPointerMove)
+    svg.addEventListener('pointerup', onPointerUpOrCancel)
+    svg.addEventListener('pointercancel', onPointerUpOrCancel)
+    svg.addEventListener('wheel', onWheel, { passive: false })
+    svg.addEventListener('dblclick', onDblClick)
+  }
+
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+
+      // Clear old render (themeChange/pjax will rerun)
+      const oldSvg = item.querySelector('svg')
+      if (oldSvg) oldSvg.remove()
+      item.__mermaidGestureBound = false
+
+      const config = mermaidSrc.dataset.config ? JSON.parse(mermaidSrc.dataset.config) : {}
+      if (!config.theme) {
+        config.theme = theme
+      }
+      const mermaidThemeConfig = `%%{init: ${JSON.stringify(config)}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+        if (true) initMermaidGestures(item)
+        item.__mermaidOriginalSvg = svg
+        if (true) attachMermaidViewerButton(item)
+      }
+
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid@11.12.2/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  const applyThemeDefaultsConfig = theme => {
+    if (theme === 'dark-mode') {
+      Chart.defaults.color = "rgba(255, 255, 255, 0.8)"
+      Chart.defaults.borderColor = "rgba(255, 255, 255, 0.2)"
+      Chart.defaults.scale.ticks.backdropColor = "transparent"
+    } else {
+      Chart.defaults.color = "rgba(0, 0, 0, 0.8)"
+      Chart.defaults.borderColor = "rgba(0, 0, 0, 0.1)"
+      Chart.defaults.scale.ticks.backdropColor = "transparent"
+    }
+  }
+
+  // Recursively traverse the config object and automatically apply theme-specific color schemes
+  const applyThemeConfig = (obj, theme) => {
+    if (typeof obj !== 'object' || obj === null) return
+
+    Object.keys(obj).forEach(key => {
+      const value = obj[key]
+      // If the property is an object and has theme-specific options, apply them
+      if (typeof value === 'object' && value !== null) {
+        if (value[theme]) {
+          obj[key] = value[theme] // Apply the value for the current theme
+        } else {
+          // Recursively process child objects
+          applyThemeConfig(value, theme)
+        }
+      }
+    })
+  }
+
+  const runChartJS = ele => {
+    window.loadChartJS = true
+
+    Array.from(ele).forEach((item, index) => {
+      const chartSrc = item.firstElementChild
+      const chartID = item.getAttribute('data-chartjs-id') || ('chartjs-' + index) // Use custom ID or default ID
+      const width = item.getAttribute('data-width')
+      const existingCanvas = document.getElementById(chartID)
+
+      // If a canvas already exists, remove it to avoid rendering duplicates
+      if (existingCanvas) {
+          existingCanvas.parentNode.remove()
+      }
+
+      const chartDefinition = chartSrc.textContent
+      const canvas = document.createElement('canvas')
+      canvas.id = chartID
+
+      const div = document.createElement('div')
+      div.className = 'chartjs-wrap'
+
+      if (width) {
+        div.style.width = width
+      }
+
+      div.appendChild(canvas)
+      chartSrc.insertAdjacentElement('afterend', div)
+
+      const ctx = document.getElementById(chartID).getContext('2d')
+
+      const config = JSON.parse(chartDefinition)
+
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark-mode' : 'light-mode'
+
+      // Set default styles (initial setup)
+      applyThemeDefaultsConfig(theme)
+
+      // Automatically traverse the config and apply dual-mode color schemes
+      applyThemeConfig(config, theme)
+
+      new Chart(ctx, config)
+    })
+  }
+
+  const loadChartJS = () => {
+    const chartJSEle = document.querySelectorAll('#article-container .chartjs-container')
+    if (chartJSEle.length === 0) return
+
+    window.loadChartJS ? runChartJS(chartJSEle) : btf.getScript('https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js').then(() => runChartJS(chartJSEle))
+  }
+
+  // Listen for theme change events
+  btf.addGlobalFn('themeChange', loadChartJS, 'chartjs')
+  btf.addGlobalFn('encrypt', loadChartJS, 'chartjs')
+
+  window.pjax ? loadChartJS() : document.addEventListener('DOMContentLoaded', loadChartJS)
+})()</script></div><div class="aplayer no-destroy" data-id="2331639478" data-server="netease" data-type="playlist" data-fixed="true" data-mini="true" data-listFolded="false" data-order="random" data-lrctype="1" data-preload="none" data-autoplay="false" muted></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/fireworks.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/metingjs/dist/Meting.min.js"></script><script>(() => {
+  const destroyAplayer = () => {
+    if (window.aplayers) {
+      for (let i = 0; i < window.aplayers.length; i++) {
+        if (!window.aplayers[i].options.fixed) {
+          window.aplayers[i].destroy()
+        }
+      }
+    }
+  }
+
+  const runMetingJS = () => {
+    typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+  }
+
+  btf.addGlobalFn('pjaxSend', destroyAplayer, 'destroyAplayer')
+  btf.addGlobalFn('pjaxComplete', loadMeting, 'runMetingJS')
+})()</script><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js" defer="defer"></script><script>document.addEventListener('DOMContentLoaded', () => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => {
+      try {
+        fn()
+      } catch (err) {
+        console.debug('Pjax callback failed:', err)
+      }
+    })
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || item.innerHTML || ""
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    if (e.request.status === 404) {
+      false
+        ? pjax.loadUrl('/404.html')
+        : window.location.href = e.request.responseURL
+    }
+  })
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.4"></script></div></div></body></html>
