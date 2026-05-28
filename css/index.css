@@ -5944,9 +5944,6 @@ figure.highlight pre .javascript .function {
 .mermaid-wrap > svg:active {
   cursor: grabbing;
 }
-pre > code.mermaid {
-  display: none;
-}
 .chartjs-container {
   display: -webkit-box;
   display: -moz-box;
