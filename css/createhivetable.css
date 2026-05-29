@@ -1,0 +1,347 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 32px 24px;
+}
+
+/* 主容器 */
+.dashboard {
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+/* 头部 */
+.hero {
+    text-align: center;
+    margin-bottom: 32px;
+}
+.hero h1 {
+    font-size: 2.2rem;
+    background: linear-gradient(135deg, #1A2A3F, #2C3E50);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    letter-spacing: -0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+.hero p {
+    color: #4a5568;
+    margin-top: 8px;
+    font-size: 0.9rem;
+}
+
+/* 选项卡样式 */
+.tabs {
+    display: flex;
+    gap: 12px;
+    background: white;
+    padding: 8px 20px;
+    border-radius: 60px;
+    width: fit-content;
+    margin: 0 auto 28px auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.tab-btn {
+    background: transparent;
+    border: none;
+    padding: 10px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #2d3e50;
+    font-family: inherit;
+}
+.tab-btn i {
+    margin-right: 8px;
+    font-style: normal;
+}
+.tab-btn.active {
+    background: #1e2a3a;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.tab-btn:not(.active):hover {
+    background: #e2e8f0;
+}
+
+/* 公用卡片 */
+.card {
+    background: rgb(243, 245, 245);
+    border-radius: 28px;
+    box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15);
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+/* 面板容器 */
+.panel {
+    display: none;
+    animation: fade 0.25s ease;
+}
+.panel.active-panel {
+    display: block;
+}
+
+@keyframes fade {
+    from { opacity: 0; transform: translateY(5px);}
+    to { opacity: 1; transform: translateY(0);}
+}
+
+/* ---------- 血缘解析面板样式 ---------- */
+.sql-section {
+    padding: 28px 30px;
+    background:  rgb(243, 245, 245);
+}
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.badge {
+    background: #1e2a3a;
+    color: white;
+    padding: 2px 12px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: normal;
+}
+textarea {
+width: 100%;
+    padding: 16px;
+    /* 推荐使用 Monaco, Menlo, Consolas 等等宽字体，它们在代码显示上更清晰 */
+    font-family: 'Consolas', 'Monaco', 'Menlo', 'Courier New', monospace;
+    font-size: 14px; /* 稍微增大字号 */
+    line-height: 1.6; /* 增加行高，减少拥挤感 */
+    letter-spacing: 0.5px; /* 轻微增加字间距 */
+    
+    /* 优化字体渲染，使边缘更清晰 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    
+    border: 1.5px solid #e2e8f0;
+    border-radius: 20px;
+    resize: vertical;
+    transition: 0.2s;
+    background: #ffffff; /* 纯白背景对比度更高 */
+    color: #1e293b; /* 使用深灰蓝色，比纯黑柔和但依然清晰 */
+
+    /* ...其他属性... */
+    tab-size: 4; /* 统一制表符宽度 */
+    white-space: pre; /* 保持空格和换行 */
+    overflow-wrap: normal; /* 防止长单词断行影响对齐 */
+    overflow-x: auto; /* 允许横向滚动 */
+}
+textarea:focus {
+    outline: none;
+    border-color: #667eea; /* 聚焦时使用主题色 */
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15)
+}
+.btn-group {
+    margin-top: 20px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.btn {
+    padding: 10px 26px;
+    border: none;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-primary {
+    background: #1e2a3a;
+    color: white;
+}
+.btn-primary:hover {
+    background: #0f1722;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+}
+.btn-secondary {
+    background: #e53e3e;
+    color: white;
+}
+.btn-secondary:hover {
+    background: #c53030;
+}
+.result-section {
+    padding: 24px 30px 30px;
+    background: #f9fafb;
+    border-top: 1px solid #edf2f7;
+}
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+.stats {
+    display: flex;
+    gap: 12px;
+}
+.stat-card {
+    background: white;
+    padding: 6px 24px;
+    border-radius: 40px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    text-align: center;
+}
+.stat-number {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1e2a3a;
+}
+.stat-label {
+    font-size: 12px;
+    color: #5a6e85;
+}
+.tables-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+.table-box {
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    border: 1px solid #edf2f7;
+}
+.table-title {
+    background: #f1f5f9;
+    padding: 14px 24px;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 1px solid #e2e8f0;
+}
+.table-list {
+    padding: 16px;
+    max-height: 380px;
+    overflow-y: auto;
+}
+.table-item {
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    background: #f8fafc;
+    border-radius: 14px;
+    font-family: monospace;
+    font-size: 13px;
+    border-left: 4px solid #2c5282;
+    transition: all 0.1s;
+    word-break: break-all;
+}
+.empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: #8a99b0;
+}
+.error-message {
+    background: #fff5f5;
+    color: #c53030;
+    padding: 16px;
+    border-radius: 20px;
+    border-left: 5px solid #e53e3e;
+}
+.success-message {
+    background: #e6fffa;
+    color: #276749;
+    padding: 12px 18px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+.loading {
+    text-align: center;
+    padding: 50px;
+}
+.spinner {
+    border: 3px solid #e2e8f0;
+    border-top: 3px solid #1e2a3a;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* ---------- 建表转换面板样式 ---------- */
+.converter-grid {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding: 28px 30px;
+}
+.convert-panel {
+    flex: 1;
+    min-width: 280px;
+    background: #ffffff;
+    border-radius: 24px;
+    border: 1px solid #eef2f6;
+    overflow: hidden;
+}
+.panel-header {
+    background: #c8d5ec;
+    padding: 14px 20px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+.panel-header button {
+    background: #e2e8f0;
+    border: none;
+    padding: 5px 14px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: 0.2s;
+}
+.panel-header button:hover {
+    background: #cbd5e1;
+}
+.convert-panel textarea {
+    height: 540px;
+    border-radius: 0;
+    border: none;
+    background: #fefefe;
+    resize: vertical;
+}
+.output-panel textarea {
+    background: #f9fafb;
+}
+.footer-note {
+    text-align: center;
+    padding: 14px 20px 20px;
+    font-size: 12px;
+    color: #5b6e8c;
+    border-top: 1px solid #edf2f7;
+}
+
+@media (max-width: 900px) {
+    body { padding: 20px 16px; }
+    .converter-grid { flex-direction: column; }
+    .convert-panel textarea { height: 340px; }
+    .tab-btn { padding: 6px 16px; font-size: 0.9rem; }
+}
