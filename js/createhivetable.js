@@ -1,5 +1,177 @@
 (function() {
-    // ----------------------------- 1. 血缘解析模块 -----------------------------
+
+// ----------------------------- 1. 血缘解析模块 (纯前端实现) -----------------------------
+// const lineageSqlInput = document.getElementById('lineageSqlInput');
+// const lineageParseBtn = document.getElementById('lineageParseBtn');
+// const lineageClearBtn = document.getElementById('lineageClearBtn');
+// const lineageResultContent = document.getElementById('lineageResultContent');
+// const lineageStatsDiv = document.getElementById('lineageStats');
+// const upstreamCountSpan = document.getElementById('upstreamCount');
+
+// // 提供示例 SQL
+// const defaultLineageSQL = `-- 示例: 查询订单宽表依赖
+// WITH user_base AS (
+//     SELECT id, name FROM dim.user_info WHERE dt = '20250301'
+// )
+// SELECT 
+//     o.order_id,
+//     o.order_amount,
+//     u.name as user_name,
+//     p.product_name
+// FROM ods.order_info o
+// LEFT JOIN user_base u ON o.user_id = u.id
+// LEFT JOIN dim.product_dim p ON o.product_id = p.id
+// WHERE o.dt = '20250301'`;
+    
+//     if (!lineageSqlInput.value.trim()) {
+//         lineageSqlInput.value = defaultLineageSQL;
+//     }
+
+//     /**
+//      * 核心解析函数：模拟 SQL 解析专家
+//      * 1. 提取 CTE (WITH 子句)
+//      * 2. 提取 FROM 和 JOIN 中的表
+//      * 3. 排除 CTE 名称（因为它们是临时视图，不是物理表，除非你希望保留它们，通常血缘分析关注物理表）
+//      * 4. 去重并排序
+//      */
+//     function extractTablesFromSQL(sql) {
+//         if (!sql || !sql.trim()) return [];
+
+//         let cleanSql = sql.replace(/--.*$/gm, '') // 去除单行注释
+//                           .replace(/\/\*[\s\S]*?\*\//g, '') // 去除多行注释
+//                           .trim();
+
+//         // 1. 提取 CTE 名称 (WITH ... AS (...))
+//         // 匹配 WITH 后面跟着的标识符，直到 AS (
+//         const cteNames = new Set();
+//         const cteRegex = /\bWITH\s+(?:RECURSIVE\s+)?([\s\S]*?)\s+SELECT/i;
+//         // 更简单的策略：匹配 identifier AS (
+//         const asPattern = /([a-zA-Z0-9_]+)\s+AS\s+\(/gi;
+        
+//         // 先尝试找到 WITH 块
+//         let withBlockMatch = cleanSql.match(/\bWITH\s+([\s\S]*)/i);
+//         if (withBlockMatch) {
+//             let withContent = withBlockMatch[1];
+//             // 在 WITH 块中查找 "name AS ("
+//             let match;
+//             while ((match = asPattern.exec(withContent)) !== null) {
+//                 // 排除一些关键字如 RECURSIVE
+//                 if (!['RECURSIVE'].includes(match[1].toUpperCase())) {
+//                     cteNames.add(match[1].toLowerCase());
+//                 }
+//             }
+//         }
+
+//         // 2. 提取所有可能的表名 (FROM table, JOIN table)
+//         // 匹配 FROM 或 JOIN 后面的标识符 (支持 db.table 格式)
+//         // 忽略子查询 (FROM (...)
+//         const tableCandidates = new Set();
+        
+//         // 正则解释：
+//         // (?:FROM|JOIN)\s+ : 匹配 FROM 或 JOIN 关键字
+//         // (?!\() : 确保后面不是左括号 (排除子查询)
+//         // ([a-zA-Z0-9_.]+) : 捕获表名 (支持库名.表名)
+//         const tableRegex = /\b(?:FROM|JOIN)\s+(?!\()([a-zA-Z0-9_\.]+)/gi;
+        
+//         let match;
+//         while ((match = tableRegex.exec(cleanSql)) !== null) {
+//             let tableName = match[1];
+//             // 去除可能的别名干扰 (例如 FROM table t1 -> 取 table)
+//             // 上面的正则只捕获到空格前，所以通常已经是表名了。
+//             // 但如果表名包含反引号 `db`.`table`，需要清理
+//             tableName = tableName.replace(/`/g, '');
+//             tableCandidates.add(tableName);
+//         }
+
+//         // 3. 过滤掉 CTE 名称 (如果希望只显示物理表)
+//         // 如果你希望 CTE 也显示在列表中，可以注释掉下面这段过滤逻辑
+//         const physicalTables = Array.from(tableCandidates).filter(t => {
+//             // 比较时忽略大小写
+//             return !cteNames.has(t.toLowerCase().split('.').pop()); 
+//         });
+
+//         // 4. 排序 (按首字母)
+//         return physicalTables.sort((a, b) => a.localeCompare(b));
+//     }
+
+//     async function parseSQL() {
+//         const sql = lineageSqlInput.value.trim();
+//         if (!sql) {
+//             showLineageError('请输入 SQL 语句');
+//             return;
+//         }
+        
+//         showLineageLoading();
+
+//         // 模拟一点延迟，让用户感觉像是在处理
+//         setTimeout(() => {
+//             try {
+//                 const tables = extractTablesFromSQL(sql);
+//                 displayLineageResult(tables);
+//             } catch (error) {
+//                 console.error('解析出错:', error);
+//                 showLineageError('解析过程中发生错误，请检查 SQL 格式。');
+//             }
+//         }, 300);
+//     }
+
+//     function showLineageLoading() {
+//         lineageStatsDiv.style.display = 'none';
+//         lineageResultContent.innerHTML = `
+//             <div class="loading">
+//                 <div class="spinner"></div>
+//                 <p style="margin-top: 16px; color: #4a5568;">正在解析血缘关系...</p>
+//             </div>
+//         `;
+//     }
+
+//     function displayLineageResult(tables) {
+//         upstreamCountSpan.textContent = tables.length;
+//         lineageStatsDiv.style.display = 'flex';
+
+//         let html = '';
+//         html += `<div class="tables-container">
+//                     <div class="table-box">
+//                         <div class="table-title">⬆️ 上游依赖表 (${tables.length})</div>
+//                         <div class="table-list">`;
+        
+//         if (tables.length === 0) {
+//             html += `<div class="empty-state" style="padding: 30px;">未检测到物理表引用<br><span style="font-size:12px;color:#999">(可能仅引用了 CTE 或子查询)</span></div>`;
+//         } else {
+//             tables.forEach(table => {
+//                 // 高亮显示库名和表名
+//                 const parts = table.split('.');
+//                 let displayName = table;
+//                 if (parts.length > 1) {
+//                     displayName = `<span style="color:#667eea">${parts[0]}</span>.<span style="font-weight:bold">${parts[1]}</span>`;
+//                 }
+//                 html += `<div class="table-item">📁 ${displayName}</div>`;
+//             });
+//         }
+//         html += `</div></div></div>`;
+//         lineageResultContent.innerHTML = html;
+//     }
+
+//     function showLineageError(message) {
+//         lineageStatsDiv.style.display = 'none';
+//         lineageResultContent.innerHTML = `<div class="error-message">❌ ${message}</div>`;
+//     }
+
+//     function clearLineage() {
+//         lineageSqlInput.value = '';
+//         lineageResultContent.innerHTML = `<div class="empty-state">⚡ 点击“解析血缘关系”按钮开始分析</div>`;
+//         lineageStatsDiv.style.display = 'none';
+//     }
+
+//     // 绑定事件
+//     lineageParseBtn.addEventListener('click', parseSQL);
+//     lineageClearBtn.addEventListener('click', clearLineage);
+//     lineageSqlInput.addEventListener('keydown', (e) => {
+//         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+//             e.preventDefault();
+//             parseSQL();
+//         }
+//     });
     const API_BASE = 'http://10.246.129.82:9090';
     const lineageSqlInput = document.getElementById('lineageSqlInput');
     const lineageParseBtn = document.getElementById('lineageParseBtn');

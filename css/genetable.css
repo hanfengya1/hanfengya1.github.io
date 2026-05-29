@@ -1,0 +1,270 @@
+/* ========== 现代简洁表格样式 ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f5f7fb;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    padding: 32px 24px;
+}
+
+/* 卡片容器 */
+.table-card {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+}
+
+/* 头部 */
+.card-header {
+    padding: 20px 24px 12px 24px;
+    border-bottom: 1px solid #242525;
+}
+.card-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a2c3e;
+    margin: 0;
+}
+.card-header p {
+    font-size: 0.85rem;
+    color: #5b6e8c;
+    margin-top: 6px;
+}
+
+/* DataTables 布局：搜索和显示条数同行 */
+.dataTables_wrapper {
+    padding: 0 20px 16px 20px;
+}
+.dataTables_length,
+.dataTables_filter {
+    display: inline-block;
+    margin: 16px 0 8px 0;
+}
+.dataTables_length {
+    float: left;
+}
+.dataTables_filter {
+    float: right;
+}
+.dataTables_wrapper::after {
+    content: '';
+    display: table;
+    clear: both;
+}
+.dataTables_length label,
+.dataTables_filter label {
+    font-size: 0.8rem;
+    color: #4a5b7a;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.dataTables_length select {
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    background: white;
+    padding: 5px 24px 5px 8px;
+    font-size: 0.8rem;
+    color: #1f2a3e;
+    cursor: pointer;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 8"><path fill="%236b7b9a" d="M6 8L0 0h12z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+}
+.dataTables_filter input {
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    padding: 5px 8px 5px 28px;
+    font-size: 0.8rem;
+    width: 220px;
+    outline: none;
+    color: #1f2a3e;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%236b7b9a" stroke-width="2"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 8px center;
+}
+.dataTables_filter input:focus {
+    border-color: #3182ce;
+    box-shadow: 0 0 0 2px rgba(49,130,206,0.1);
+}
+
+/* 横向滚动容器 */
+.table-scroll {
+    overflow-x: auto;
+    margin: 8px 0 0 0;
+    border-radius: 12px;
+}
+
+/* 表格基本样式 */
+table.dataTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 !important;
+    border: 1px solid #cbd5e0; /* 整体外边框：深灰色 */
+    min-width: 900px;
+}
+
+/* 列宽控制 */
+table.dataTable th:nth-child(1),
+table.dataTable td:nth-child(1) {
+    width: 100px;
+}
+table.dataTable th:nth-child(2),
+table.dataTable td:nth-child(2) {
+    min-width: 320px;
+}
+table.dataTable th:nth-child(3),
+table.dataTable td:nth-child(3) {
+    min-width: 180px;
+}
+table.dataTable th:nth-child(4),
+table.dataTable td:nth-child(4) {
+    width: 100px;
+}
+
+/* 表头样式 - 深蓝背景，白色文字 */
+table.dataTable thead th {
+    background: #1e2f4a;
+    padding: 12px 16px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #ffffff;
+    border-bottom: 1px solid #cbd5e0; /* 底部边框 */
+    border-right: 1px solid #cbd5e0;  /* 右侧边框：深灰色 */
+}
+/* 去掉表头最后一列的右边框，防止双重边框 */
+table.dataTable thead th:last-child {
+    border-right: none;
+}
+/* 表体单元格 */
+table.dataTable tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #cbd5e0; /* 底部边框：深灰色 */
+    border-right: 1px solid #cbd5e0;  /* 右侧边框：深灰色 */
+    vertical-align: top;
+    font-size: 0.85rem;
+    color: #1e2f41;
+    line-height: 1.5;
+}
+/* 去掉表体每一行最后一列的右边框 */
+table.dataTable tbody td:last-child {
+    border-right: none;
+}
+/* 主键列样式 */
+table.dataTable td:first-child {
+    font-family: 'SF Mono', monospace;
+    font-weight: 500;
+    color: #2c6288;
+}
+
+/* 函数列 - 使用等宽字体便于识别代码 */
+table.dataTable td:nth-child(2) {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* 日期列 */
+table.dataTable td:last-child {
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+
+table.dataTable tbody tr {
+    background-color: #ffffff;
+}
+table.dataTable tbody tr:nth-child(even) {
+    background-color: #f7fafd;
+}
+
+/* 行悬浮效果 */
+table.dataTable tbody tr:hover td {
+    background-color:#ecf5fc;
+}
+
+/* 底部信息栏 */
+.dataTables_info {
+    font-size: 0.75rem;
+    color: #5f7d9c;
+    padding-top: 16px;
+    float: left;
+}
+.dataTables_paginate {
+    float: right;
+    padding-top: 12px;
+}
+.dataTables_paginate .paginate_button {
+    border-radius: 6px !important;
+    border: 1px solid #242525 !important;
+    background: #ffffff !important;
+    color: #2c6288 !important;
+    font-size: 0.75rem !important;
+    font-weight: 500;
+    padding: 4px 10px !important;
+    margin: 0 2px;
+    transition: all 0.2s;
+}
+.dataTables_paginate .paginate_button.current {
+    background: #e6f0fa !important;
+    border-color: #3182ce !important;
+    color: #1a5a7a !important;
+}
+.dataTables_paginate .paginate_button:hover:not(.current) {
+    background: #f1f5f9 !important;
+    border-color: #242525 !important;
+    color: #1f3a5a !important;
+}
+.dataTables_paginate .paginate_button.disabled,
+.dataTables_paginate .paginate_button.disabled:hover {
+    background: #f9fbfd !important;
+    border-color: #242525 !important;
+    color: #b8c9dd !important;
+}
+
+/* 页脚备注 */
+.footer-note {
+    padding: 12px 24px;
+    border-top: 1px solid #242525;
+    font-size: 0.7rem;
+    color: #7e92ab;
+    text-align: right;
+    background: white;
+}
+
+/* 移动端适配 */
+@media (max-width: 700px) {
+    body { padding: 16px; }
+    .dataTables_length,
+    .dataTables_filter {
+        float: none;
+        display: block;
+        margin-bottom: 12px;
+    }
+    .dataTables_filter input {
+        width: 100%;
+    }
+    .dataTables_info,
+    .dataTables_paginate {
+        float: none;
+        text-align: center;
+    }
+    .dataTables_paginate {
+        margin-top: 12px;
+    }
+    .table-scroll {
+        margin-top: 12px;
+    }
+}
