@@ -1,102 +1,70 @@
 .todo-container {
-    max-width: 600px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
-.todo-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.todo-header h1 {
-    font-size: 2.5rem;
-    color: #2c3e50;
-    margin-bottom: 15px;
-}
-
-.todo-header .stats {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    flex-wrap: wrap;
-}
-
-.todo-header .stats span {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 14px;
-}
-
-.todo-header .stats strong {
-    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f8f9fa;
+    min-height: 100vh;
 }
 
 .todo-add {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 15px;
 }
 
 .todo-add input {
     flex: 1;
-    padding: 12px 16px;
-    font-size: 16px;
-    border: 2px solid #e1e8ed;
-    border-radius: 10px;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    padding: 10px 12px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
 }
 
 .todo-add input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #5b8def;
 }
 
 .todo-add button {
-    padding: 12px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 10px 18px;
+    background: #5b8def;
     color: white;
     border: none;
-    border-radius: 10px;
-    font-size: 16px;
+    border-radius: 6px;
+    font-size: 14px;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .todo-add button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    background: #4a7cd4;
 }
 
 .todo-filters {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 15px;
 }
 
 .filter-btn {
-    padding: 8px 20px;
-    border: 2px solid #e1e8ed;
+    padding: 6px 14px;
+    border: 1px solid #ddd;
     background: white;
-    border-radius: 20px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s;
+    font-size: 13px;
 }
 
 .filter-btn:hover {
-    border-color: #667eea;
-    color: #667eea;
+    border-color: #5b8def;
+    color: #5b8def;
 }
 
 .filter-btn.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-color: transparent;
+    background: #5b8def;
+    border-color: #5b8def;
     color: white;
 }
 
@@ -109,17 +77,11 @@
 .todo-item {
     display: flex;
     align-items: center;
-    padding: 15px;
+    padding: 12px;
     background: white;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s;
-}
-
-.todo-item:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    transform: translateX(4px);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border: 1px solid #eee;
 }
 
 .todo-item.completed {
@@ -128,83 +90,244 @@
 
 .todo-item.completed .todo-content {
     text-decoration: line-through;
-    color: #95a5a6;
+    color: #999;
 }
 
 .todo-checkbox {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
-    margin-right: 15px;
-    accent-color: #667eea;
+    margin-right: 12px;
 }
 
 .todo-content {
     flex: 1;
-    font-size: 16px;
-    color: #2c3e50;
+    font-size: 15px;
+    color: #333;
     word-break: break-all;
 }
 
 .todo-content.editing {
-    outline: 2px solid #667eea;
-    padding: 4px 8px;
-    border-radius: 6px;
+    outline: 1px solid #5b8def;
+    padding: 4px 6px;
+    border-radius: 4px;
 }
 
 .todo-actions {
     display: flex;
-    gap: 8px;
+    gap: 6px;
 }
 
 .todo-action-btn {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 16px;
-    transition: all 0.2s;
+    font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .todo-action-btn.edit {
-    background: #f39c12;
+    background: #f0ad4e;
     color: white;
 }
 
 .todo-action-btn.delete {
-    background: #e74c3c;
+    background: #d9534f;
     color: white;
-}
-
-.todo-action-btn:hover {
-    transform: scale(1.1);
 }
 
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    border-radius: 16px;
-    margin-top: 20px;
+    padding: 40px 20px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #eee;
 }
 
 .empty-state p {
-    font-size: 18px;
-    color: #7f8c8d;
+    font-size: 15px;
+    color: #999;
     margin: 0;
+}
+
+.tab-container {
+    margin-bottom: 15px;
+}
+
+.tab-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+    background: white;
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid #eee;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.tab-btn:hover {
+    background: #f0f4f8;
+}
+
+.tab-btn.active {
+    background: #5b8def;
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.note-container {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.note-add {
+    margin-bottom: 15px;
+}
+
+.note-add textarea {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    resize: vertical;
+    min-height: 80px;
+    box-sizing: border-box;
+    background: white;
+}
+
+.note-add textarea:focus {
+    outline: none;
+    border-color: #5b8def;
+}
+
+.note-add .btn-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.note-add button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.note-add .btn-primary {
+    background: #5b8def;
+    color: white;
+}
+
+.note-add .btn-secondary {
+    background: #e9ecef;
+    color: #333;
+}
+
+.note-add button:hover {
+    opacity: 0.9;
+}
+
+.note-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.note-item {
+    background: white;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+    border: 1px solid #eee;
+}
+
+.note-content {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.note-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: #999;
+}
+
+.note-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.note-action-btn {
+    padding: 4px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.note-action-btn.edit {
+    background: #f0ad4e;
+    color: white;
+}
+
+.note-action-btn.delete {
+    background: #d9534f;
+    color: white;
+}
+
+.note-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #eee;
+}
+
+.note-empty-state p {
+    font-size: 15px;
+    color: #999;
+    margin: 0;
+}
+
+.note-content.editing {
+    outline: 1px solid #5b8def;
+    padding: 6px;
+    border-radius: 4px;
+    min-height: 60px;
 }
 
 @media (max-width: 640px) {
     .todo-container {
-        padding: 15px;
-    }
-
-    .todo-header h1 {
-        font-size: 1.8rem;
+        padding: 10px;
     }
 
     .todo-add {
@@ -212,15 +335,20 @@
     }
 
     .todo-add button {
-        padding: 12px;
+        padding: 10px;
     }
 
     .todo-filters {
-        gap: 8px;
+        gap: 6px;
     }
 
     .filter-btn {
-        padding: 6px 12px;
+        padding: 5px 10px;
         font-size: 12px;
+    }
+
+    .tab-btn {
+        padding: 6px 12px;
+        font-size: 13px;
     }
 }
