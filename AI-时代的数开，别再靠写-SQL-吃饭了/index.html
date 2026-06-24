@@ -1,0 +1,752 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>AI 时代的数开，别再靠写 SQL 吃饭了 | ALICS</title><meta name="author" content="HangFengYa"><meta name="copyright" content="HangFengYa"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="AI 时代的数开，别再靠写 SQL 吃饭了 作者：hanfengya  假期和一个工作 8 年的数开小伙伴吃饭，他半开玩笑地说：“我现在写复杂 JOIN，下意识会先让 AI 写，自己只做 review。”我整整 8 年的吃饭手艺，正在变成一个 review 别人代码的人。  一、写 SQL，曾经是怎么成为护城河的？10 年前会写 SQL 是稀缺的。复杂 JOIN、窗口函数、CTE 嵌套——业务方">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI 时代的数开，别再靠写 SQL 吃饭了">
+<meta property="og:url" content="http://hangfengya.com/AI-%E6%97%B6%E4%BB%A3%E7%9A%84%E6%95%B0%E5%BC%80%EF%BC%8C%E5%88%AB%E5%86%8D%E9%9D%A0%E5%86%99-SQL-%E5%90%83%E9%A5%AD%E4%BA%86/index.html">
+<meta property="og:site_name" content="ALICS">
+<meta property="og:description" content="AI 时代的数开，别再靠写 SQL 吃饭了 作者：hanfengya  假期和一个工作 8 年的数开小伙伴吃饭，他半开玩笑地说：“我现在写复杂 JOIN，下意识会先让 AI 写，自己只做 review。”我整整 8 年的吃饭手艺，正在变成一个 review 别人代码的人。  一、写 SQL，曾经是怎么成为护城河的？10 年前会写 SQL 是稀缺的。复杂 JOIN、窗口函数、CTE 嵌套——业务方">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://wmimg.com/i/2062/2026/03/69bcbc0ea9b63.jpg">
+<meta property="article:published_time" content="2026-06-24T01:12:39.000Z">
+<meta property="article:modified_time" content="2026-06-24T01:26:14.370Z">
+<meta property="article:author" content="HangFengYa">
+<meta property="article:tag" content="ideal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wmimg.com/i/2062/2026/03/69bcbc0ea9b63.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "AI 时代的数开，别再靠写 SQL 吃饭了",
+  "url": "http://hangfengya.com/AI-%E6%97%B6%E4%BB%A3%E7%9A%84%E6%95%B0%E5%BC%80%EF%BC%8C%E5%88%AB%E5%86%8D%E9%9D%A0%E5%86%99-SQL-%E5%90%83%E9%A5%AD%E4%BA%86/",
+  "image": "https://wmimg.com/i/2062/2026/03/69bcbc0ea9b63.jpg",
+  "datePublished": "2026-06-24T01:12:39.000Z",
+  "dateModified": "2026-06-24T01:26:14.370Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ALICS",
+      "url": "http://hangfengya.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://hangfengya.com/AI-%E6%97%B6%E4%BB%A3%E7%9A%84%E6%95%B0%E5%BC%80%EF%BC%8C%E5%88%AB%E5%86%8D%E9%9D%A0%E5%86%99-SQL-%E5%90%83%E9%A5%AD%E4%BA%86/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.json","preload":true,"top_n_per_article":3,"unescape":false,"pagination":{"enable":true,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":400,"highlightFullpage":true,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'AI 时代的数开，别再靠写 SQL 吃饭了',
+  isHighlightShrink: true,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/announcement.css"><link rel="stylesheet" href="/css/footer.css"><script src="https://cdn.bootcss.com/echarts/4.3.0/echarts.min.js"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/photos/01.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-book"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/tools/"><i class="fa-fw fas fa-tags"></i><span> 工具页</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://wmimg.com/i/2062/2026/03/69bcbc0ea9b63.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ALICS</span></a><a class="nav-page-title" href="/"><span class="site-name">AI 时代的数开，别再靠写 SQL 吃饭了</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-book"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/tools/"><i class="fa-fw fas fa-tags"></i><span> 工具页</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">AI 时代的数开，别再靠写 SQL 吃饭了</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-06-24T01:12:39.000Z" title="发表于 2026-06-24 09:12:39">2026-06-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-06-24T01:26:14.370Z" title="更新于 2026-06-24 09:26:14">2026-06-24</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/study/">study</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">1.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>4分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><hr>
+<h1 id="AI-时代的数开，别再靠写-SQL-吃饭了"><a href="#AI-时代的数开，别再靠写-SQL-吃饭了" class="headerlink" title="AI 时代的数开，别再靠写 SQL 吃饭了"></a>AI 时代的数开，别再靠写 SQL 吃饭了</h1><blockquote>
+<p>作者：hanfengya</p>
+</blockquote>
+<p>假期和一个工作 8 年的数开小伙伴吃饭，他半开玩笑地说：“我现在写复杂 JOIN，下意识会先让 AI 写，自己只做 review。”<strong>我整整 8 年的吃饭手艺，正在变成一个 review 别人代码的人。</strong></p>
+<hr>
+<h2 id="一、写-SQL，曾经是怎么成为护城河的？"><a href="#一、写-SQL，曾经是怎么成为护城河的？" class="headerlink" title="一、写 SQL，曾经是怎么成为护城河的？"></a>一、写 SQL，曾经是怎么成为护城河的？</h2><p>10 年前会写 SQL 是稀缺的。复杂 JOIN、窗口函数、CTE 嵌套——业务方写不来，资深开发月薪能比业务高 50%。</p>
+<p>写 SQL 之所以是护城河，因为它同时考验三件事：</p>
+<ul>
+<li><strong>业务理解</strong>——这个数怎么算才对？</li>
+<li><strong>工程能力</strong>——这段 SQL 怎么写才不慢？</li>
+<li><strong>数据敏感</strong>——这个结果合不合理？</li>
+</ul>
+<p>10 年里，这三件事只有人能做。所以“会写 SQL”&#x3D; 有饭吃。</p>
+<hr>
+<h2 id="二、AI-时代变了什么？"><a href="#二、AI-时代变了什么？" class="headerlink" title="二、AI 时代变了什么？"></a>二、AI 时代变了什么？</h2><p>3 个变化，把这碗饭抖了一下：</p>
+<h3 id="①-Agent-已经能写-80-场景的-SQL"><a href="#①-Agent-已经能写-80-场景的-SQL" class="headerlink" title="① Agent 已经能写 80% 场景的 SQL"></a>① Agent 已经能写 80% 场景的 SQL</h3><p>Cursor &#x2F; Claude Code &#x2F; GPT 起来，对绝大多数 BI 场景够用。“过去 30 天每个城市的 DAU”——5 秒，0 等待。</p>
+<h3 id="②-上下文窗口容得下整个数仓"><a href="#②-上下文窗口容得下整个数仓" class="headerlink" title="② 上下文窗口容得下整个数仓"></a>② 上下文窗口容得下整个数仓</h3><p>Claude 1M Token、GPT-6 200 万 Token，中型数仓的全部 DDL + 业务说明 + 指标口径，一次性丢进去都装得下。模型一旦看到“全图”，写 SQL 就不再是猜字段，而是看着完整 schema 写。</p>
+<h3 id="③-工具链补齐了"><a href="#③-工具链补齐了" class="headerlink" title="③ 工具链补齐了"></a>③ 工具链补齐了</h3><p>sqlglot 校验、dbt 管依赖、语义层强制口径一致。“AI 写 SQL”从 demo 变成了生产可用。</p>
+<hr>
+<h2 id="三、写-SQL-为什么不再是护城河？"><a href="#三、写-SQL-为什么不再是护城河？" class="headerlink" title="三、写 SQL 为什么不再是护城河？"></a>三、写 SQL 为什么不再是护城河？</h2><p>把“写 SQL”拆成 3 件事，看 Agent 各占了多少：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>5 年前的人</th>
+<th>今天的 Agent</th>
+<th>谁更强</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>写复杂 JOIN&#x2F;窗口函数</td>
+<td>1 小时</td>
+<td>30 秒，准确率 95%</td>
+<td>Agent</td>
+</tr>
+<tr>
+<td>业务理解</td>
+<td>凭经验</td>
+<td>看上下文也有 80%</td>
+<td>持平</td>
+</tr>
+<tr>
+<td>数据敏感（结果合不合理）</td>
+<td>凭经验</td>
+<td>看 outlier 报告</td>
+<td>人略胜</td>
+</tr>
+</tbody></table>
+<p><strong>真相：写 SQL 这件事，80% 的工作量正在变成“打字”。数开真正值钱的部分，从来不是“打字快”，是“判断对”。</strong></p>
+<hr>
+<h2 id="四、那数开的核心价值往哪去？"><a href="#四、那数开的核心价值往哪去？" class="headerlink" title="四、那数开的核心价值往哪去？"></a>四、那数开的核心价值往哪去？</h2><p>3 条新增长曲线，每一条都比“写 SQL”更值钱：</p>
+<div class="mermaid-wrap"><pre class="mermaid-src" data-config="{&quot;themeVariables&quot;: { &quot;fontSize&quot;: &quot;16px&quot; }, &quot;layout&quot;: &quot;elk&quot;, &quot;look&quot;: &quot;handDrawn&quot;}" hidden>
+    flowchart LR
+  A[传统技能：编写SQL]
+  A --&gt; B1[曲线1：数据架构与治理决策]
+  A --&gt; B2[曲线2：让数据被AI看懂]
+  A --&gt; B3[曲线3：Skill与Agent工程化]
+
+  B1 --&gt; C1[表结构设计与分层决策]
+  B1 --&gt; C2[指标口径一致性治理]
+  B1 --&gt; C3[战略决策与判断]
+  B1 --&gt; C4[数据血缘合理性评估]
+  B1 --&gt; C5[业务影响面深度分析]
+
+  B2 --&gt; D1[LLM-Ready 元数据工程]
+  B2 --&gt; D2[语义层与指标注册表]
+  B2 --&gt; D3[语义基础设施建设]
+  B2 --&gt; D4[RAG可召回性治理]
+  B2 --&gt; D5[字段级血缘自动化]
+
+  B3 --&gt; E1[数仓开发流程模块化]
+  B3 --&gt; E2[Agent自动化监控告警]
+  B3 --&gt; E3[工作流自动化杠杆]
+  B3 --&gt; E4[自动化对账与数据稽核]
+  B3 --&gt; E5[影响面自动排查Skill]
+  </pre></div>
+
+<h3 id="曲线-1：数据架构与治理决策"><a href="#曲线-1：数据架构与治理决策" class="headerlink" title="曲线 1：数据架构与治理决策"></a>曲线 1：数据架构与治理决策</h3><p>Agent 能写 SQL，但不能决定：</p>
+<ul>
+<li>这张表该不该建？建在哪一层？</li>
+<li>这个指标有没有口径冲突？</li>
+<li>这套数据血缘合理吗？影响面几何？</li>
+</ul>
+<p>这些是判断题，不是选择题。判断题需要业务积累 + 工程经验，Agent 帮不了你。</p>
+<h3 id="曲线-2：让数据“被-AI-看懂”"><a href="#曲线-2：让数据“被-AI-看懂”" class="headerlink" title="曲线 2：让数据“被 AI 看懂”"></a>曲线 2：让数据“被 AI 看懂”</h3><p>这是个全新岗位。具体做：</p>
+<ul>
+<li><strong>LLM Ready 元数据</strong>——让 Agent 能理解每张表的业务用途、字段取值</li>
+<li><strong>语义层 &#x2F; 指标 registry</strong>——让 Agent 写 SQL 时不会乱用口径</li>
+<li><strong>可召回性治理</strong>——让 RAG &#x2F; AI 搜索能找到该找到的数据</li>
+<li><strong>字段级血缘</strong>——让异常追溯从 3 小时压到 5 分钟</li>
+</ul>
+<p>这些工作 5 年前根本不存在。今天它们正在变成新的核心岗位。</p>
+<h3 id="曲线-3：Skill-Agent-工程化"><a href="#曲线-3：Skill-Agent-工程化" class="headerlink" title="曲线 3：Skill &#x2F; Agent 工程化"></a>曲线 3：Skill &#x2F; Agent 工程化</h3><p>如果说前两条是“做新事”，这条是“用新方式做老事”。</p>
+<p>让 Agent 替你写 SQL、跑、监控、告警、追溯——你的单位产出从“一段 SQL”变成“一个能跑的工作流”。杠杆从 1x 变成 10x。</p>
+<p>具体动作：</p>
+<ul>
+<li>用 Claude Code Skill 把数仓开发流程模块化</li>
+<li>用 Agent 替代凌晨告警、对账、影响面排查</li>
+</ul>
+<p><strong>回报：别人需要 5 个工程师做的事，你 1 个人 + 一套 Skill 就够了。</strong></p>
+<hr>
+<h2 id="五、给数开的-3-条行动建议"><a href="#五、给数开的-3-条行动建议" class="headerlink" title="五、给数开的 3 条行动建议"></a>五、给数开的 3 条行动建议</h2><h3 id="①-别再抗拒-AI-替你写-SQL"><a href="#①-别再抗拒-AI-替你写-SQL" class="headerlink" title="① 别再抗拒 AI 替你写 SQL"></a>① 别再抗拒 AI 替你写 SQL</h3><p>让 Agent 写 80% 的“打字活”，把节省的时间投到判断、设计、架构上。</p>
+<h3 id="②-主动接-1-2-个“AI-数据底座”项目"><a href="#②-主动接-1-2-个“AI-数据底座”项目" class="headerlink" title="② 主动接 1-2 个“AI 数据底座”项目"></a>② 主动接 1-2 个“AI 数据底座”项目</h3><p>元数据系统改造、语义层、字段级血缘、可召回性治理——这些项目的简历价值，比“做了 N 张报表”高很多倍。</p>
+<h3 id="③-学一两个-Agent-Skill-工具，做杠杆"><a href="#③-学一两个-Agent-Skill-工具，做杠杆" class="headerlink" title="③ 学一两个 Agent &#x2F; Skill 工具，做杠杆"></a>③ 学一两个 Agent &#x2F; Skill 工具，做杠杆</h3><p>Claude Code Skill &#x2F; sqlglot &#x2F; dbt + 语义层 &#x2F; MCP——至少要会用、能 demo、能讲清楚价值。面试时拿这些出来，比讲“我熟练 SQL”加分 10 倍。</p>
+<hr>
+<h2 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h2><p>不是 SQL 没价值了。是“只会写 SQL”没价值了。</p>
+<p>写 SQL 这件事，5 年前是手艺，现在是工具。手艺会被工具化，工具化的手艺，价值会归零。</p>
+<p>但判断、架构、治理、Agent 工程这些事，工具化短期内做不了。这才是数开未来的饭碗。</p>
+<p><strong>数开的好时代刚开始——前提是你愿意从“写 SQL 的人”升级成“让数据系统跑得起来的人”。</strong></p>
+<hr>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://hangfengya.com">ALICS</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://hangfengya.com/AI-%E6%97%B6%E4%BB%A3%E7%9A%84%E6%95%B0%E5%BC%80%EF%BC%8C%E5%88%AB%E5%86%8D%E9%9D%A0%E5%86%99-SQL-%E5%90%83%E9%A5%AD%E4%BA%86/">http://hangfengya.com/AI-%E6%97%B6%E4%BB%A3%E7%9A%84%E6%95%B0%E5%BC%80%EF%BC%8C%E5%88%AB%E5%86%8D%E9%9D%A0%E5%86%99-SQL-%E5%90%83%E9%A5%AD%E4%BA%86/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">此文章版權歸 ALICS 所有，如有轉載，請註明來自原作者</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/ideal/">ideal</a></div><div class="post-share"><div class="social-share" data-image="https://wmimg.com/i/2062/2026/03/69bcbc0ea9b63.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width no-desc" href="/python-fastapi-%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/" title="python fastapi 后端开发"><img class="cover" src="https://wmimg.com/i/2062/2026/03/69bcbc3c5248f.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">python fastapi 后端开发</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/photos/01.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">HangFengYa</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" href="javascript:void(0);"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content"><div class="announcement-gradient"><p>Life is like a period.</p><p>Annoying when it's here.</p><p>Panicking when it's not.</p></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#AI-%E6%97%B6%E4%BB%A3%E7%9A%84%E6%95%B0%E5%BC%80%EF%BC%8C%E5%88%AB%E5%86%8D%E9%9D%A0%E5%86%99-SQL-%E5%90%83%E9%A5%AD%E4%BA%86"><span class="toc-number">1.</span> <span class="toc-text">AI 时代的数开，别再靠写 SQL 吃饭了</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%86%99-SQL%EF%BC%8C%E6%9B%BE%E7%BB%8F%E6%98%AF%E6%80%8E%E4%B9%88%E6%88%90%E4%B8%BA%E6%8A%A4%E5%9F%8E%E6%B2%B3%E7%9A%84%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">一、写 SQL，曾经是怎么成为护城河的？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81AI-%E6%97%B6%E4%BB%A3%E5%8F%98%E4%BA%86%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.2.</span> <span class="toc-text">二、AI 时代变了什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%91%A0-Agent-%E5%B7%B2%E7%BB%8F%E8%83%BD%E5%86%99-80-%E5%9C%BA%E6%99%AF%E7%9A%84-SQL"><span class="toc-number">1.2.1.</span> <span class="toc-text">① Agent 已经能写 80% 场景的 SQL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%91%A1-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AA%97%E5%8F%A3%E5%AE%B9%E5%BE%97%E4%B8%8B%E6%95%B4%E4%B8%AA%E6%95%B0%E4%BB%93"><span class="toc-number">1.2.2.</span> <span class="toc-text">② 上下文窗口容得下整个数仓</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%91%A2-%E5%B7%A5%E5%85%B7%E9%93%BE%E8%A1%A5%E9%BD%90%E4%BA%86"><span class="toc-number">1.2.3.</span> <span class="toc-text">③ 工具链补齐了</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%86%99-SQL-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E5%86%8D%E6%98%AF%E6%8A%A4%E5%9F%8E%E6%B2%B3%EF%BC%9F"><span class="toc-number">1.3.</span> <span class="toc-text">三、写 SQL 为什么不再是护城河？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E9%82%A3%E6%95%B0%E5%BC%80%E7%9A%84%E6%A0%B8%E5%BF%83%E4%BB%B7%E5%80%BC%E5%BE%80%E5%93%AA%E5%8E%BB%EF%BC%9F"><span class="toc-number">1.4.</span> <span class="toc-text">四、那数开的核心价值往哪去？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9B%B2%E7%BA%BF-1%EF%BC%9A%E6%95%B0%E6%8D%AE%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%B2%BB%E7%90%86%E5%86%B3%E7%AD%96"><span class="toc-number">1.4.1.</span> <span class="toc-text">曲线 1：数据架构与治理决策</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9B%B2%E7%BA%BF-2%EF%BC%9A%E8%AE%A9%E6%95%B0%E6%8D%AE%E2%80%9C%E8%A2%AB-AI-%E7%9C%8B%E6%87%82%E2%80%9D"><span class="toc-number">1.4.2.</span> <span class="toc-text">曲线 2：让数据“被 AI 看懂”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9B%B2%E7%BA%BF-3%EF%BC%9ASkill-Agent-%E5%B7%A5%E7%A8%8B%E5%8C%96"><span class="toc-number">1.4.3.</span> <span class="toc-text">曲线 3：Skill &#x2F; Agent 工程化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E7%BB%99%E6%95%B0%E5%BC%80%E7%9A%84-3-%E6%9D%A1%E8%A1%8C%E5%8A%A8%E5%BB%BA%E8%AE%AE"><span class="toc-number">1.5.</span> <span class="toc-text">五、给数开的 3 条行动建议</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%91%A0-%E5%88%AB%E5%86%8D%E6%8A%97%E6%8B%92-AI-%E6%9B%BF%E4%BD%A0%E5%86%99-SQL"><span class="toc-number">1.5.1.</span> <span class="toc-text">① 别再抗拒 AI 替你写 SQL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%91%A1-%E4%B8%BB%E5%8A%A8%E6%8E%A5-1-2-%E4%B8%AA%E2%80%9CAI-%E6%95%B0%E6%8D%AE%E5%BA%95%E5%BA%A7%E2%80%9D%E9%A1%B9%E7%9B%AE"><span class="toc-number">1.5.2.</span> <span class="toc-text">② 主动接 1-2 个“AI 数据底座”项目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%91%A2-%E5%AD%A6%E4%B8%80%E4%B8%A4%E4%B8%AA-Agent-Skill-%E5%B7%A5%E5%85%B7%EF%BC%8C%E5%81%9A%E6%9D%A0%E6%9D%86"><span class="toc-number">1.5.3.</span> <span class="toc-text">③ 学一两个 Agent &#x2F; Skill 工具，做杠杆</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E5%9C%A8%E6%9C%80%E5%90%8E"><span class="toc-number">1.6.</span> <span class="toc-text">写在最后</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/AI-%E6%97%B6%E4%BB%A3%E7%9A%84%E6%95%B0%E5%BC%80%EF%BC%8C%E5%88%AB%E5%86%8D%E9%9D%A0%E5%86%99-SQL-%E5%90%83%E9%A5%AD%E4%BA%86/" title="AI 时代的数开，别再靠写 SQL 吃饭了"><img src="https://wmimg.com/i/2062/2026/03/69bcbc0ea9b63.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="AI 时代的数开，别再靠写 SQL 吃饭了"/></a><div class="content"><a class="title" href="/AI-%E6%97%B6%E4%BB%A3%E7%9A%84%E6%95%B0%E5%BC%80%EF%BC%8C%E5%88%AB%E5%86%8D%E9%9D%A0%E5%86%99-SQL-%E5%90%83%E9%A5%AD%E4%BA%86/" title="AI 时代的数开，别再靠写 SQL 吃饭了">AI 时代的数开，别再靠写 SQL 吃饭了</a><time datetime="2026-06-24T01:12:39.000Z" title="发表于 2026-06-24 09:12:39">2026-06-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/python-fastapi-%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/" title="python fastapi 后端开发"><img src="https://wmimg.com/i/2062/2026/03/69bcbc3c5248f.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="python fastapi 后端开发"/></a><div class="content"><a class="title" href="/python-fastapi-%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/" title="python fastapi 后端开发">python fastapi 后端开发</a><time datetime="2026-06-16T08:22:00.000Z" title="发表于 2026-06-16 16:22:00">2026-06-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/%E7%8E%AF%E7%90%83%E6%97%85%E6%B8%B8%E6%94%BB%E7%95%A5/" title="环球旅游攻略"><img src="https://wmimg.com/i/2062/2026/03/69bcc42e1d0c9.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="环球旅游攻略"/></a><div class="content"><a class="title" href="/%E7%8E%AF%E7%90%83%E6%97%85%E6%B8%B8%E6%94%BB%E7%95%A5/" title="环球旅游攻略">环球旅游攻略</a><time datetime="2026-06-12T05:40:16.000Z" title="发表于 2026-06-12 13:40:16">2026-06-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/%E7%94%B5%E8%84%91%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/" title="电脑问题处理"><img src="https://wmimg.com/i/2062/2026/03/69bcc3d54adb7.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="电脑问题处理"/></a><div class="content"><a class="title" href="/%E7%94%B5%E8%84%91%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/" title="电脑问题处理">电脑问题处理</a><time datetime="2026-06-04T10:52:01.000Z" title="发表于 2026-06-04 18:52:01">2026-06-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/%E4%BC%81%E4%B8%9A%E8%B4%A2%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="企业财务解决方案"><img src="https://wmimg.com/i/2062/2026/03/69bcbc0ea9b63.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="企业财务解决方案"/></a><div class="content"><a class="title" href="/%E4%BC%81%E4%B8%9A%E8%B4%A2%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="企业财务解决方案">企业财务解决方案</a><time datetime="2026-06-02T05:23:16.000Z" title="发表于 2026-06-02 13:23:16">2026-06-02</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By HangFengYa</span></div><div class="footer_custom_text">Hi, welcome to my <a href="">blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="/js/tw_cn.js?v=5.5.4"></script><div class="js-pjax"><script>(() => {
+  const parseViewBox = viewBox => {
+    if (!viewBox) return null
+    const parts = viewBox.trim().split(/[\s,]+/).map(n => Number(n))
+    if (parts.length !== 4 || parts.some(n => Number.isNaN(n))) return null
+    return parts
+  }
+
+  const getSvgViewBox = svg => {
+    const attr = parseViewBox(svg.getAttribute('viewBox'))
+    if (attr) return attr
+
+    // Fallback: use bbox to build a viewBox
+    try {
+      const bbox = svg.getBBox()
+      if (bbox && bbox.width && bbox.height) return [bbox.x, bbox.y, bbox.width, bbox.height]
+    } catch (e) {
+      // getBBox may fail on some edge cases; ignore
+    }
+
+    const w = Number(svg.getAttribute('width')) || 0
+    const h = Number(svg.getAttribute('height')) || 0
+    if (w > 0 && h > 0) return [0, 0, w, h]
+    return [0, 0, 100, 100]
+  }
+
+  const setSvgViewBox = (svg, vb) => {
+    svg.setAttribute('viewBox', `${vb[0]} ${vb[1]} ${vb[2]} ${vb[3]}`)
+  }
+
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v))
+
+  const openSvgInNewTab = ({ source, initViewBox }) => {
+    const getClonedSvg = () => {
+      if (typeof source === 'string') {
+        const template = document.createElement('template')
+        template.innerHTML = source.trim()
+        const svg = template.content.querySelector('svg')
+        return svg ? svg.cloneNode(true) : null
+      }
+      if (source && typeof source.cloneNode === 'function') {
+        return source.cloneNode(true)
+      }
+      return null
+    }
+
+    const clone = getClonedSvg()
+    if (!clone) return
+    if (initViewBox && initViewBox.length === 4) {
+      clone.setAttribute('viewBox', initViewBox.join(' '))
+    }
+    if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    if (!clone.getAttribute('xmlns:xlink') && clone.outerHTML.includes('xlink:')) {
+      clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+    }
+    // inject background to match current theme
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+    const bg = getComputedStyle(document.body).backgroundColor || (isDark ? '#1e1e1e' : '#ffffff')
+    if (!clone.style.background) clone.style.background = bg
+
+    const serializer = new XMLSerializer()
+    const svgSource = serializer.serializeToString(clone)
+    const htmlSource = `<!doctype html><html><head><meta charset="utf-8" />
+      <style>
+        html, body { width: 100%; height: 100%; margin: 0; display: flex; align-items: center; justify-content: center; background: ${bg}; }
+        svg { max-width: 100%; max-height: 100%; height: auto; width: auto; }
+      </style>
+      </head><body>${svgSource}</body></html>`
+    const blob = new Blob([htmlSource], { type: 'text/html;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank', 'noopener')
+    setTimeout(() => URL.revokeObjectURL(url), 30000)
+  }
+
+  const attachMermaidViewerButton = wrap => {
+    let btn = wrap.querySelector('.mermaid-open-btn')
+    if (!btn) {
+      btn = document.createElement('button')
+      btn.type = 'button'
+      btn.className = 'mermaid-open-btn'
+      wrap.appendChild(btn)
+    }
+
+    btn.innerHTML = '<i class="fa fa-search fa-fw" aria-hidden="true"></i>'
+
+    if (!btn.__mermaidViewerBound) {
+      btn.addEventListener('click', e => {
+        e.preventDefault()
+        e.stopPropagation()
+        const svg = wrap.__mermaidOriginalSvg || wrap.querySelector('svg')
+        if (!svg) return
+        const initViewBox = wrap.__mermaidInitViewBox
+        if (typeof svg === 'string') {
+          openSvgInNewTab({ source: svg, initViewBox })
+          return
+        }
+        openSvgInNewTab({ source: svg, initViewBox })
+      })
+      btn.__mermaidViewerBound = true
+    }
+  }
+
+  // Zoom around a point (px, py) in the SVG viewport (in viewBox coordinates)
+  const zoomAtPoint = (vb, factor, px, py) => {
+    const w = vb[2] * factor
+    const h = vb[3] * factor
+    const nx = px - (px - vb[0]) * factor
+    const ny = py - (py - vb[1]) * factor
+    return [nx, ny, w, h]
+  }
+
+  const initMermaidGestures = wrap => {
+    const svg = wrap.querySelector('svg')
+    if (!svg) return
+
+    // Ensure viewBox exists so gestures always work
+    const initVb = getSvgViewBox(svg)
+    wrap.__mermaidInitViewBox = initVb
+    wrap.__mermaidCurViewBox = initVb.slice()
+    setSvgViewBox(svg, initVb)
+
+    // Avoid binding multiple times on themeChange/pjax
+    if (wrap.__mermaidGestureBound) return
+    wrap.__mermaidGestureBound = true
+
+    // Helper: map client (viewport) coordinate -> viewBox coordinate
+    const clientToViewBox = (clientX, clientY) => {
+      const rect = svg.getBoundingClientRect()
+      const vb = wrap.__mermaidCurViewBox || getSvgViewBox(svg)
+      const x = vb[0] + (clientX - rect.left) * (vb[2] / rect.width)
+      const y = vb[1] + (clientY - rect.top) * (vb[3] / rect.height)
+      return { x, y, rect, vb }
+    }
+
+    const state = {
+      pointers: new Map(),
+      startVb: null,
+      startDist: 0,
+      startCenter: null
+    }
+
+    const clampVb = vb => {
+      const init = wrap.__mermaidInitViewBox || vb
+      const minW = init[2] * 0.1
+      const maxW = init[2] * 10
+      const minH = init[3] * 0.1
+      const maxH = init[3] * 10
+      vb[2] = clamp(vb[2], minW, maxW)
+      vb[3] = clamp(vb[3], minH, maxH)
+      return vb
+    }
+
+    const setCurVb = vb => {
+      vb = clampVb(vb)
+      wrap.__mermaidCurViewBox = vb
+      setSvgViewBox(svg, vb)
+    }
+
+    const onPointerDown = e => {
+      // Allow only primary button for mouse
+      if (e.pointerType === 'mouse' && e.button !== 0) return
+      svg.setPointerCapture(e.pointerId)
+      state.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+
+      if (state.pointers.size === 1) {
+        state.startVb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+      } else if (state.pointers.size === 2) {
+        const pts = [...state.pointers.values()]
+        const dx = pts[0].x - pts[1].x
+        const dy = pts[0].y - pts[1].y
+        state.startDist = Math.hypot(dx, dy)
+        state.startVb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+        state.startCenter = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 }
+      }
+    }
+
+    const onPointerMove = e => {
+      if (!state.pointers.has(e.pointerId)) return
+      state.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+
+      // Pan with 1 pointer
+      if (state.pointers.size === 1 && state.startVb) {
+        const p = [...state.pointers.values()][0]
+        const prev = { x: e.clientX - e.movementX, y: e.clientY - e.movementY }
+        // movementX/Y unreliable on touch, compute from stored last position
+        const last = wrap.__mermaidLastSinglePointer || p
+        const dxClient = p.x - last.x
+        const dyClient = p.y - last.y
+        wrap.__mermaidLastSinglePointer = p
+
+        const { rect } = clientToViewBox(p.x, p.y)
+        const vb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+        const dx = dxClient * (vb[2] / rect.width)
+        const dy = dyClient * (vb[3] / rect.height)
+        setCurVb([vb[0] - dx, vb[1] - dy, vb[2], vb[3]])
+        return
+      }
+
+      // Pinch zoom with 2 pointers
+      if (state.pointers.size === 2 && state.startVb && state.startDist > 0) {
+        const pts = [...state.pointers.values()]
+        const dx = pts[0].x - pts[1].x
+        const dy = pts[0].y - pts[1].y
+        const dist = Math.hypot(dx, dy)
+        if (!dist) return
+        const factor = state.startDist / dist // dist bigger => zoom in (viewBox smaller)
+
+        const cx = (pts[0].x + pts[1].x) / 2
+        const cy = (pts[0].y + pts[1].y) / 2
+        const centerClient = { x: cx, y: cy }
+
+        const pxy = clientToViewBox(centerClient.x, centerClient.y)
+        const cpx = pxy.x
+        const cpy = pxy.y
+
+        const vb = zoomAtPoint(state.startVb, factor, cpx, cpy)
+        setCurVb(vb)
+      }
+    }
+
+    const onPointerUpOrCancel = e => {
+      state.pointers.delete(e.pointerId)
+      if (state.pointers.size === 0) {
+        state.startVb = null
+        state.startDist = 0
+        state.startCenter = null
+        wrap.__mermaidLastSinglePointer = null
+      } else if (state.pointers.size === 1) {
+        // reset single pointer baseline to avoid jump
+        wrap.__mermaidLastSinglePointer = [...state.pointers.values()][0]
+      }
+    }
+
+    // Wheel zoom (mouse/trackpad)
+    const onWheel = e => {
+      // ctrlKey on mac trackpad pinch; we treat both as zoom
+      e.preventDefault()
+      const delta = e.deltaY
+      const zoomFactor = delta > 0 ? 1.1 : 0.9
+      const { x, y } = clientToViewBox(e.clientX, e.clientY)
+      const vb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+      setCurVb(zoomAtPoint(vb, zoomFactor, x, y))
+    }
+
+    const onDblClick = () => {
+      const init = wrap.__mermaidInitViewBox
+      if (!init) return
+      wrap.__mermaidCurViewBox = init.slice()
+      setSvgViewBox(svg, init)
+    }
+
+    svg.addEventListener('pointerdown', onPointerDown)
+    svg.addEventListener('pointermove', onPointerMove)
+    svg.addEventListener('pointerup', onPointerUpOrCancel)
+    svg.addEventListener('pointercancel', onPointerUpOrCancel)
+    svg.addEventListener('wheel', onWheel, { passive: false })
+    svg.addEventListener('dblclick', onDblClick)
+  }
+
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+
+      // Clear old render (themeChange/pjax will rerun)
+      const oldSvg = item.querySelector('svg')
+      if (oldSvg) oldSvg.remove()
+      item.__mermaidGestureBound = false
+
+      const config = mermaidSrc.dataset.config ? JSON.parse(mermaidSrc.dataset.config) : {}
+      if (!config.theme) {
+        config.theme = theme
+      }
+      const mermaidThemeConfig = `%%{init: ${JSON.stringify(config)}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+        if (true) initMermaidGestures(item)
+        item.__mermaidOriginalSvg = svg
+        if (true) attachMermaidViewerButton(item)
+      }
+
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid@11.12.2/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  const applyThemeDefaultsConfig = theme => {
+    if (theme === 'dark-mode') {
+      Chart.defaults.color = "rgba(255, 255, 255, 0.8)"
+      Chart.defaults.borderColor = "rgba(255, 255, 255, 0.2)"
+      Chart.defaults.scale.ticks.backdropColor = "transparent"
+    } else {
+      Chart.defaults.color = "rgba(0, 0, 0, 0.8)"
+      Chart.defaults.borderColor = "rgba(0, 0, 0, 0.1)"
+      Chart.defaults.scale.ticks.backdropColor = "transparent"
+    }
+  }
+
+  // Recursively traverse the config object and automatically apply theme-specific color schemes
+  const applyThemeConfig = (obj, theme) => {
+    if (typeof obj !== 'object' || obj === null) return
+
+    Object.keys(obj).forEach(key => {
+      const value = obj[key]
+      // If the property is an object and has theme-specific options, apply them
+      if (typeof value === 'object' && value !== null) {
+        if (value[theme]) {
+          obj[key] = value[theme] // Apply the value for the current theme
+        } else {
+          // Recursively process child objects
+          applyThemeConfig(value, theme)
+        }
+      }
+    })
+  }
+
+  const runChartJS = ele => {
+    window.loadChartJS = true
+
+    Array.from(ele).forEach((item, index) => {
+      const chartSrc = item.firstElementChild
+      const chartID = item.getAttribute('data-chartjs-id') || ('chartjs-' + index) // Use custom ID or default ID
+      const width = item.getAttribute('data-width')
+      const existingCanvas = document.getElementById(chartID)
+
+      // If a canvas already exists, remove it to avoid rendering duplicates
+      if (existingCanvas) {
+          existingCanvas.parentNode.remove()
+      }
+
+      const chartDefinition = chartSrc.textContent
+      const canvas = document.createElement('canvas')
+      canvas.id = chartID
+
+      const div = document.createElement('div')
+      div.className = 'chartjs-wrap'
+
+      if (width) {
+        div.style.width = width
+      }
+
+      div.appendChild(canvas)
+      chartSrc.insertAdjacentElement('afterend', div)
+
+      const ctx = document.getElementById(chartID).getContext('2d')
+
+      const config = JSON.parse(chartDefinition)
+
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark-mode' : 'light-mode'
+
+      // Set default styles (initial setup)
+      applyThemeDefaultsConfig(theme)
+
+      // Automatically traverse the config and apply dual-mode color schemes
+      applyThemeConfig(config, theme)
+
+      new Chart(ctx, config)
+    })
+  }
+
+  const loadChartJS = () => {
+    const chartJSEle = document.querySelectorAll('#article-container .chartjs-container')
+    if (chartJSEle.length === 0) return
+
+    window.loadChartJS ? runChartJS(chartJSEle) : btf.getScript('https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js').then(() => runChartJS(chartJSEle))
+  }
+
+  // Listen for theme change events
+  btf.addGlobalFn('themeChange', loadChartJS, 'chartjs')
+  btf.addGlobalFn('encrypt', loadChartJS, 'chartjs')
+
+  window.pjax ? loadChartJS() : document.addEventListener('DOMContentLoaded', loadChartJS)
+})()</script></div><div class="aplayer no-destroy" data-id="2331639478" data-server="netease" data-type="playlist" data-fixed="true" data-mini="true" data-listFolded="false" data-order="random" data-lrctype="1" data-preload="none" data-autoplay="false" muted></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/fireworks.min.js"></script><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/canvas-fluttering-ribbon.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/metingjs/dist/Meting.min.js"></script><script>(() => {
+  const destroyAplayer = () => {
+    if (window.aplayers) {
+      for (let i = 0; i < window.aplayers.length; i++) {
+        if (!window.aplayers[i].options.fixed) {
+          window.aplayers[i].destroy()
+        }
+      }
+    }
+  }
+
+  const runMetingJS = () => {
+    typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+  }
+
+  btf.addGlobalFn('pjaxSend', destroyAplayer, 'destroyAplayer')
+  btf.addGlobalFn('pjaxComplete', loadMeting, 'runMetingJS')
+})()</script><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js" defer="defer"></script><script>document.addEventListener('DOMContentLoaded', () => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => {
+      try {
+        fn()
+      } catch (err) {
+        console.debug('Pjax callback failed:', err)
+      }
+    })
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || item.innerHTML || ""
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    if (e.request.status === 404) {
+      false
+        ? pjax.loadUrl('/404.html')
+        : window.location.href = e.request.responseURL
+    }
+  })
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.4"></script></div></div></body></html>
